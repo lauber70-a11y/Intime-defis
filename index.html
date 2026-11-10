@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intimité & Défis — Édition Privée</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        noir: {
+                            900: '#0a0a0c',
+                            800: '#121216',
+                            700: '#1a1a22',
+                            600: '#272733'
+                        },
+                        velours: {
+                            DEFAULT: '#881337',
+                            light: '#9f1239',
+                            rose: '#fda4af'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        
+        .card-perspective { perspective: 1200px; }
+        .card-inner {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+        .card-inner.flipped { transform: rotateY(180deg); }
+        .card-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-back { transform: rotateY(180deg); }
+
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .animate-pulse-subtle { animation: pulse-subtle 1.5s infinite ease-in-out; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(253, 164, 175, 0.2); border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-noir-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-rose-900 selection:text-white" id="app-body">
+
+    <!-- Top Navigation Bar -->
+    <header class="px-6 py-4 flex justify-between items-center bg-noir-900/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('screen-home')">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-600 to-rose-900 flex items-center justify-center shadow-lg shadow-rose-950/50">
+                <i class="fa-solid fa-fire text-white text-sm"></i>
+            </div>
+            <div>
+                <h1 class="font-serif text-sm font-semibold tracking-wider text-rose-100">INTIMITÉ</h1>
+                <p class="text-[10px] tracking-widest uppercase text-rose-400/60 font-medium">Expérience Privée</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-1.5">
+            <button onclick="toggleDimMode()" id="dim-btn" title="Lumière tamisée" class="w-10 h-10 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-rose-300 flex items-center justify-center transition">
+                <i class="fa-solid fa-moon text-xs"></i>
+            </button>
+            <button onclick="showScreen('screen-gallery')" title="Galerie" class="w-10 h-10 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-rose-300 flex items-center justify-center transition relative">
+                <i class="fa-solid fa-photo-film text-xs"></i>
+                <span id="media-badge" class="hidden absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full"></span>
+            </button>
+            <button onclick="showScreen('screen-builder')" title="Atelier" class="w-10 h-10 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-rose-300 flex items-center justify-center transition">
+                <i class="fa-solid fa-sliders text-xs"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main View Content -->
+    <main class="flex-1 max-w-md w-full mx-auto p-5 flex flex-col justify-center">
+
+        <!-- SCREEN 1: HOME CONFIGURATION -->
+        <section id="screen-home" class="space-y-6">
+            <div class="space-y-1 text-center py-2">
+                <h2 class="font-serif text-2xl font-normal text-rose-50">Créez votre moment</h2>
+                <p class="text-xs text-slate-400">Mode duo ou solo, profils, intensité et jokers</p>
+            </div>
+
+            <div class="bg-noir-800/90 border border-white/5 p-5 rounded-3xl shadow-2xl space-y-4 backdrop-blur-md">
+                
+                <!-- Choix du Mode de jeu -->
+                <div class="space-y-2">
+                    <label class="text-[11px] font-semibold tracking-wider uppercase text-rose-300/80 block">Mode de jeu</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="setGameMode('duo')" id="btn-mode-duo" class="py-2.5 px-3 text-xs rounded-xl border border-rose-600/50 bg-rose-950/30 text-rose-200 font-medium transition text-center">
+                            👥 Mode Duo (Alterné)
+                        </button>
+                        <button type="button" onclick="setGameMode('solo')" id="btn-mode-solo" class="py-2.5 px-3 text-xs rounded-xl border border-white/5 bg-noir-900 text-slate-400 font-medium transition text-center">
+                            👤 Mode Solo (Dédié)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section Configuration Duo -->
+                <div id="setup-duo-container" class="space-y-3">
+                    <div class="bg-noir-900/60 p-3.5 rounded-2xl border border-white/5 space-y-2">
+                        <label class="text-[11px] font-semibold tracking-wider uppercase text-rose-300/80 block">Partenaire 1</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="p1-name" value="Partenaire 1" class="flex-1 bg-noir-800 border border-white/5 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-600 transition">
+                            <select id="p1-gender" class="bg-noir-800 border border-white/5 rounded-xl px-3 text-xs text-slate-300 focus:outline-none">
+                                <option value="male">♂️ Lui</option>
+                                <option value="female">♀️ Elle</option>
+                                <option value="neutral">👤 Mixte</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="text-[11px] text-slate-400">Jokers initiaux :</span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="adjustSetupJokers(1, -1)" class="w-6 h-6 rounded bg-noir-800 border border-white/10 text-amber-300 flex items-center justify-center text-xs">-</button>
+                                <span id="setup-p1-jokers" class="text-xs font-mono font-bold text-amber-300 min-w-[20px] text-center">1</span>
+                                <button type="button" onclick="adjustSetupJokers(1, 1)" class="w-6 h-6 rounded bg-noir-800 border border-white/10 text-amber-300 flex items-center justify-center text-xs">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-noir-900/60 p-3.5 rounded-2xl border border-white/5 space-y-2">
+                        <label class="text-[11px] font-semibold tracking-wider uppercase text-rose-300/80 block">Partenaire 2</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="p2-name" value="Partenaire 2" class="flex-1 bg-noir-800 border border-white/5 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-600 transition">
+                            <select id="p2-gender" class="bg-noir-800 border border-white/5 rounded-xl px-3 text-xs text-slate-300 focus:outline-none">
+                                <option value="female" selected>♀️ Elle</option>
+                                <option value="male">♂️ Lui</option>
+                                <option value="neutral">👤 Mixte</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="text-[11px] text-slate-400">Jokers initiaux :</span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="adjustSetupJokers(2, -1)" class="w-6 h-6 rounded bg-noir-800 border border-white/10 text-amber-300 flex items-center justify-center text-xs">-</button>
+                                <span id="setup-p2-jokers" class="text-xs font-mono font-bold text-amber-300 min-w-[20px] text-center">1</span>
+                                <button type="button" onclick="adjustSetupJokers(2, 1)" class="w-6 h-6 rounded bg-noir-800 border border-white/10 text-amber-300 flex items-center justify-center text-xs">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Configuration Solo (Caché par défaut) -->
+                <div id="setup-solo-container" class="hidden space-y-3">
+                    <div class="bg-noir-900/60 p-3.5 rounded-2xl border border-white/5 space-y-2">
+                        <label class="text-[11px] font-semibold tracking-wider uppercase text-rose-300/80 block">Joueur en Solo</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="solo-name" value="Mon Profil" class="flex-1 bg-noir-800 border border-white/5 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-600 transition">
+                            <select id="solo-gender" class="bg-noir-800 border border-white/5 rounded-xl px-3 text-xs text-slate-300 focus:outline-none">
+                                <option value="female">♀️ Elle</option>
+                                <option value="male">♂️ Lui</option>
+                                <option value="neutral">👤 Mixte</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Réglage global de la durée par défi (Minutes) -->
+                <div class="space-y-2">
+                    <label class="text-[11px] font-semibold tracking-wider uppercase text-rose-300/80 block">Durée globale par défi</label>
+                    <div class="bg-noir-900/60 p-3 rounded-2xl border border-white/5 flex items-center justify-between">
+                        <span class="text-xs text-slate-300 font-medium">Temps alloué :</span>
+                        <div class="flex items-center gap-3">
+                            <button type="button" onclick="adjustGlobalDuration(-1)" class="w-8 h-8 rounded-lg bg-noir-800 border border-white/10 text-rose-300 hover:bg-rose-950/40 flex items-center justify-center font-bold text-sm transition">-</button>
+                            <span id="global-duration-display" class="text-xs font-mono font-bold text-rose-200 min-w-[60px] text-center">2 min</span>
+                            <button type="button" onclick="adjustGlobalDuration(1)" class="w-8 h-8 rounded-lg bg-noir-800 border border-white/10 text-rose-300 hover:bg-rose-950/40 flex items-center justify-center font-bold text-sm transition">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progression Mode -->
+                <div class="space-y-2">
+                    <label class="text-[11px] font-semibold tracking-wider uppercase text-rose-300/80 block">Niveau d'Intensité</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="setProgressionMode('fixed')" id="btn-mode-fixed" class="py-2.5 px-3 text-xs rounded-xl border border-rose-600/50 bg-rose-950/30 text-rose-200 font-medium transition text-center">
+                            🔒 Fixe (Niveau Unique)
+                        </button>
+                        <button type="button" onclick="setProgressionMode('pyramid')" id="btn-mode-pyramid" class="py-2.5 px-3 text-xs rounded-xl border border-white/5 bg-noir-900 text-slate-400 font-medium transition text-center">
+                            🔺 Pyramide (Évolutif)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Single Level Select -->
+                <div id="single-level-container">
+                    <select id="single-level-select" class="w-full bg-noir-900 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-600">
+                        <option value="1">✨ Niveau 1 : Doux & Suggestif</option>
+                        <option value="2">🔥 Niveau 2 : Piquant & Insolent</option>
+                        <option value="3">⚡ Niveau 3 : Torride & Intense</option>
+                    </select>
+                </div>
+
+                <!-- Ordre de passage -->
+                <div class="space-y-2">
+                    <label class="text-[11px] font-semibold tracking-wider uppercase text-rose-300/80 block">Déroulement</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="setOrderMode('sequential')" id="btn-order-seq" class="py-2.5 px-3 text-xs rounded-xl border border-rose-600/50 bg-rose-950/30 text-rose-200 font-medium transition text-center">
+                            🔢 Ordre Séquentiel
+                        </button>
+                        <button type="button" onclick="setOrderMode('random')" id="btn-order-rand" class="py-2.5 px-3 text-xs rounded-xl border border-white/5 bg-noir-900 text-slate-400 font-medium transition text-center">
+                            🎲 Aléatoire / Tirage
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Button -->
+            <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-rose-700 to-rose-900 hover:from-rose-600 hover:to-rose-800 text-white font-medium rounded-2xl shadow-xl shadow-rose-950/40 text-sm tracking-wider uppercase flex items-center justify-center gap-3 transition active:scale-98">
+                <span>Lancer la session</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </section>
+
+        <!-- SCREEN 2: GAMEPLAY -->
+        <section id="screen-game" class="hidden space-y-4">
+            <!-- Header bar -->
+            <div class="bg-noir-800/80 border border-white/5 px-4 py-3 rounded-2xl flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                    <span id="current-player-badge" class="px-2.5 py-1 bg-rose-950/80 text-rose-200 rounded-lg font-semibold border border-rose-900/50"></span>
+                    <span id="game-level-badge" class="text-slate-400 text-[11px]"></span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="btn-joker" onclick="useJoker()" title="Utiliser son Joker" class="hidden px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg font-semibold transition hover:bg-amber-500/30 flex items-center gap-1">
+                        <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Joker (<span id="joker-count">1</span>)
+                    </button>
+                    <span id="game-progress-count" class="text-slate-500 font-mono text-[11px]">0/0</span>
+                </div>
+            </div>
+
+            <!-- Card Container -->
+            <div class="card-perspective w-full h-[400px]">
+                <div id="card-inner" class="card-inner relative w-full h-full shadow-2xl rounded-3xl">
+                    
+                    <!-- Card Front -->
+                    <div class="card-face absolute inset-0 bg-gradient-to-br from-noir-800 to-noir-900 border border-white/5 rounded-3xl p-8 flex flex-col items-center justify-center text-center cursor-pointer animate-pulse-subtle" onclick="revealCard()">
+                        <div class="w-16 h-16 rounded-2xl bg-rose-950/40 border border-rose-900/30 flex items-center justify-center mb-4 text-rose-400 text-xl shadow-inner">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h3 class="font-serif text-lg font-medium text-rose-100 mb-1">Carte mystère</h3>
+                        <p class="text-xs text-slate-400">Touchez pour révéler le défi</p>
+                    </div>
+
+                    <!-- Card Back -->
+                    <div class="card-face card-back absolute inset-0 bg-noir-800 border border-white/10 rounded-3xl p-6 flex flex-col justify-between overflow-y-auto">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span id="card-category-tag" class="text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-md bg-rose-950/60 text-rose-300 border border-rose-900/40 font-medium"></span>
+                                <span id="card-timer-container" class="hidden text-xs font-mono font-semibold text-rose-400 flex items-center gap-1.5 bg-noir-900 px-2.5 py-1 rounded-lg border border-white/5">
+                                    <i class="fa-regular fa-clock"></i> <span id="timer-display">00:00</span>
+                                </span>
+                            </div>
+
+                            <p id="card-text-display" class="text-sm md:text-base text-slate-100 font-normal leading-relaxed pt-2"></p>
+
+                            <div id="card-media-preview" class="hidden rounded-xl overflow-hidden border border-white/5 bg-noir-900 relative"></div>
+                        </div>
+
+                        <div class="space-y-2.5 pt-4 border-t border-white/5">
+                            <div id="timer-action-container" class="hidden">
+                                <button id="btn-start-timer" onclick="startTimer()" class="w-full py-2.5 bg-emerald-950/60 border border-emerald-800/40 hover:bg-emerald-900/60 text-emerald-200 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-play"></i> Démarrer le chronomètre
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="openMediaCapture('photo')" class="py-2.5 px-2 bg-noir-900 hover:bg-noir-700 border border-white/5 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
+                                    <i class="fa-solid fa-camera text-rose-400 text-xs"></i> Photo
+                                </button>
+                                <button onclick="openMediaCapture('video')" class="py-2.5 px-2 bg-noir-900 hover:bg-noir-700 border border-white/5 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
+                                    <i class="fa-solid fa-video text-rose-400 text-xs"></i> Vidéo
+                                </button>
+                                <button onclick="openInGameGalleryPicker()" class="py-2.5 px-2 bg-noir-900 hover:bg-noir-700 border border-white/5 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
+                                    <i class="fa-solid fa-photo-film text-amber-400 text-xs"></i> Galerie
+                                </button>
+                            </div>
+
+                            <button onclick="nextTurn()" class="w-full py-3 bg-rose-700 hover:bg-rose-600 text-white font-medium rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition">
+                                <span>Défi suivant</span> <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="showScreen('screen-home')" class="w-full py-2 text-xs text-slate-500 hover:text-slate-300 transition text-center">
+                Quitter la session
+            </button>
+        </section>
+
+        <!-- SCREEN 5: FIN DE PARTIE -->
+        <section id="screen-game-over" class="hidden space-y-6 text-center py-10">
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-rose-950/60 border border-rose-900/50 flex items-center justify-center text-rose-300 text-2xl shadow-xl shadow-rose-950/50">
+                <i class="fa-solid fa-flag-checkered"></i>
+            </div>
+            <div class="space-y-2">
+                <h2 class="font-serif text-3xl font-normal text-rose-50">Fin de la session</h2>
+                <p class="text-xs text-slate-400 max-w-xs mx-auto">Vous êtes arrivés au bout de tous les défis de cette partie. J'espère que ce moment vous a plu !</p>
+            </div>
+            <div class="pt-4 space-y-3">
+                <button onclick="showScreen('screen-home')" class="w-full py-4 bg-gradient-to-r from-rose-700 to-rose-900 hover:from-rose-600 hover:to-rose-800 text-white font-medium rounded-2xl shadow-xl shadow-rose-950/40 text-sm tracking-wider uppercase transition active:scale-98">
+                    Recommencer une partie
+                </button>
+                <button onclick="showScreen('screen-gallery')" class="w-full py-3 bg-noir-800 hover:bg-noir-700 border border-white/5 text-slate-300 font-medium rounded-2xl text-xs transition">
+                    Voir la Galerie Souvenirs
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: ATELIER DE CRÉATION & GESTION -->
+        <section id="screen-builder" class="hidden space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-serif text-lg font-medium text-rose-50">Atelier des Défis</h2>
+                    <p class="text-xs text-slate-400">Création, modification et sauvegarde globale</p>
+                </div>
+                <button onclick="showScreen('screen-home')" class="w-8 h-8 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Onglets de sélection (Défi duo / Défi solo / Carte Joker) -->
+            <div class="grid grid-cols-3 gap-1.5 bg-noir-800/80 p-1.5 rounded-2xl border border-white/5 text-[11px]">
+                <button type="button" onclick="switchBuilderTab('duo')" id="tab-duo" class="py-2 font-medium rounded-xl bg-rose-950/60 text-rose-200 border border-rose-900/40 transition">
+                    👥 Duo
+                </button>
+                <button type="button" onclick="switchBuilderTab('solo')" id="tab-solo" class="py-2 font-medium rounded-xl text-slate-400 transition">
+                    👤 Solo
+                </button>
+                <button type="button" onclick="switchBuilderTab('joker')" id="tab-joker" class="py-2 font-medium rounded-xl text-slate-400 transition">
+                    🃏 Joker
+                </button>
+            </div>
+
+            <!-- Formulaire de création/édition Défi Duo -->
+            <form id="form-create-duo" onsubmit="saveCustomChallenge(event, 'duo')" class="bg-noir-800/90 border border-white/5 p-4 rounded-3xl space-y-3">
+                <div>
+                    <label class="text-[11px] font-medium text-slate-400 mb-1 block">Intitulé du défi Duo</label>
+                    <textarea id="duo-text-input" required rows="2" placeholder="Ex: {giver} embrasse délicatement {target}..." class="w-full bg-noir-900 border border-white/5 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-rose-600 transition resize-none"></textarea>
+                    <span class="text-[10px] text-slate-500 block mt-1">Variables : <code>{giver}</code> (joueur actif), <code>{target}</code> (partenaire).</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Cible</label>
+                        <select id="duo-target-gender" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none">
+                            <option value="all">Mixte</option>
+                            <option value="male">Pour Lui</option>
+                            <option value="female">Pour Elle</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Durée (min)</label>
+                        <input type="number" id="duo-duration-minutes" min="0" max="60" value="0" placeholder="0 = Infini" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none focus:border-rose-600">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Niveau</label>
+                        <select id="duo-level" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none">
+                            <option value="1">Niveau 1</option>
+                            <option value="2">Niveau 2</option>
+                            <option value="3">Niveau 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-medium text-slate-400 mb-1 block">Associer une photo ou vidéo (Optionnel)</label>
+                    <input type="file" id="duo-media-file" accept="image/*,video/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-medium file:bg-noir-900 file:text-rose-300 hover:file:bg-noir-700">
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-medium text-xs rounded-xl transition">
+                        Ajouter le défi Duo
+                    </button>
+                    <button type="button" id="btn-cancel-edit-duo" onclick="cancelEdit('duo')" class="hidden py-2.5 px-3 bg-noir-900 border border-white/10 text-slate-400 text-xs rounded-xl transition">
+                        Annuler
+                    </button>
+                </div>
+            </form>
+
+            <!-- Formulaire de création/édition Défi Solo (Caché par défaut) -->
+            <form id="form-create-solo" onsubmit="saveCustomChallenge(event, 'solo')" class="hidden bg-noir-800/90 border border-white/5 p-4 rounded-3xl space-y-3">
+                <div>
+                    <label class="text-[11px] font-medium text-rose-300 mb-1 block">Intitulé du défi Solo</label>
+                    <textarea id="solo-text-input" required rows="2" placeholder="Ex: {player} s'accorde 10 minutes d'exploration..." class="w-full bg-noir-900 border border-rose-500/30 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition resize-none"></textarea>
+                    <span class="text-[10px] text-slate-500 block mt-1">Variable : <code>{player}</code> (le joueur en solo).</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Cible</label>
+                        <select id="solo-target-gender" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none">
+                            <option value="all">Mixte</option>
+                            <option value="male">Pour Lui</option>
+                            <option value="female">Pour Elle</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Durée (min)</label>
+                        <input type="number" id="solo-duration-minutes" min="0" max="60" value="0" placeholder="0 = Infini" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none focus:border-rose-600">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Niveau</label>
+                        <select id="solo-level" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none">
+                            <option value="1">Niveau 1</option>
+                            <option value="2">Niveau 2</option>
+                            <option value="3">Niveau 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-medium text-slate-400 mb-1 block">Associer une photo ou vidéo (Optionnel)</label>
+                    <input type="file" id="solo-media-file" accept="image/*,video/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-medium file:bg-noir-900 file:text-rose-300 hover:file:bg-noir-700">
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-medium text-xs rounded-xl transition">
+                        Ajouter le défi Solo
+                    </button>
+                    <button type="button" id="btn-cancel-edit-solo" onclick="cancelEdit('solo')" class="hidden py-2.5 px-3 bg-noir-900 border border-white/10 text-slate-400 text-xs rounded-xl transition">
+                        Annuler
+                    </button>
+                </div>
+            </form>
+
+            <!-- Formulaire de création/édition Carte Joker (Caché par défaut) -->
+            <form id="form-create-joker" onsubmit="saveCustomJoker(event)" class="hidden bg-noir-800/90 border border-white/5 p-4 rounded-3xl space-y-3">
+                <div>
+                    <label class="text-[11px] font-medium text-amber-300 mb-1 block">Effet ou texte de la Carte Joker personnalisée</label>
+                    <textarea id="joker-text-input" required rows="3" placeholder="Ex: {giver} gagne le droit d'échanger ce défi ou d'imposer un gage de son choix à {target}..." class="w-full bg-noir-900 border border-amber-500/30 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500 transition resize-none">✨ {giver} active sa Carte Joker : immunité totale pour ce tour ou échange de gage avec {target} !</textarea>
+                    <span class="text-[10px] text-slate-500 block mt-1">Variables : <code>{giver}</code>, <code>{target}</code>.</span>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-500 text-noir-900 font-bold text-xs rounded-xl transition shadow-lg shadow-amber-950/40">
+                        Créer la Carte Joker
+                    </button>
+                    <button type="button" id="btn-cancel-edit-joker" onclick="cancelEdit('joker')" class="hidden py-2.5 px-3 bg-noir-900 border border-white/10 text-slate-400 text-xs rounded-xl transition">
+                        Annuler
+                    </button>
+                </div>
+            </form>
+
+            <!-- Liste et boutons Sauvegarde Globale (Défis + Galerie) -->
+            <div class="space-y-2">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Séquence & Défis (<span id="challenges-count">0</span>)</span>
+                    <button onclick="clearAllChallenges()" class="text-[11px] text-rose-400/80 hover:text-rose-300">Réinitialiser</button>
+                </div>
+
+                <div id="challenges-list" class="space-y-2 max-h-[150px] overflow-y-auto pr-1"></div>
+
+                <!-- Boutons Sauvegarde Totale (Défis + Photos/Vidéos) -->
+                <div class="flex gap-2 pt-2 border-t border-white/5">
+                    <button type="button" onclick="exportFullBackup()" class="flex-1 py-2.5 bg-rose-950/40 border border-rose-900/60 hover:bg-rose-900/40 text-[11px] text-rose-200 rounded-xl transition flex items-center justify-center gap-1.5 font-medium">
+                        <i class="fa-solid fa-file-arrow-down"></i> Sauvegarder Tout (Zip/JSON)
+                    </button>
+                    <label class="flex-1 py-2.5 bg-noir-800 border border-white/5 hover:border-rose-600 text-[11px] text-slate-300 rounded-xl transition text-center cursor-pointer flex items-center justify-center gap-1.5 font-medium">
+                        <i class="fa-solid fa-file-arrow-up text-rose-400"></i> Restaurer Tout
+                        <input type="file" id="import-full-file" accept=".json" onchange="importFullBackup(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: GALERIE -->
+        <section id="screen-gallery" class="hidden space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-serif text-lg font-medium text-rose-50">Galerie Souvenirs</h2>
+                    <p class="text-xs text-slate-400">Vignettes et gestion des captures</p>
+                </div>
+                <button onclick="showScreen('screen-home')" class="w-8 h-8 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Grille de miniatures (3 colonnes) -->
+            <div id="gallery-grid" class="grid grid-cols-3 gap-2.5 max-h-[420px] overflow-y-auto pr-1"></div>
+        </section>
+
+    </main>
+
+    <!-- MEDIA PREVIEW LIGHTBOX MODAL -->
+    <div id="lightbox-modal" class="fixed inset-0 bg-noir-900/95 z-50 hidden flex flex-col justify-between p-5 backdrop-blur-xl">
+        <div class="flex justify-between items-center text-slate-200">
+            <span class="font-serif text-sm">Visualisation du souvenir</span>
+            <button onclick="closeLightbox()" class="w-8 h-8 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+        </div>
+        <div id="lightbox-content" class="relative flex-1 my-4 bg-noir-800 rounded-3xl overflow-hidden flex items-center justify-center border border-white/5"></div>
+        <div class="flex justify-center">
+            <button id="btn-delete-from-lightbox" onclick="deleteCurrentLightboxMedia()" class="py-2.5 px-5 bg-rose-950/80 border border-rose-900/60 text-rose-200 hover:bg-rose-900 text-xs font-medium rounded-xl flex items-center gap-2 transition">
+                <i class="fa-solid fa-trash"></i> Supprimer ce souvenir
+            </button>
+        </div>
+    </div>
+
+    <!-- MEDIA CAPTURE MODAL -->
+    <div id="media-modal" class="fixed inset-0 bg-noir-900/95 z-50 hidden flex flex-col justify-between p-5 backdrop-blur-xl">
+        <div class="flex justify-between items-center text-slate-200">
+            <span class="font-serif text-sm">Capture en direct</span>
+            <button onclick="closeMediaModal()" class="w-8 h-8 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+        </div>
+
+        <div class="relative flex-1 my-4 bg-noir-800 rounded-3xl overflow-hidden flex items-center justify-center border border-white/5">
+            <video id="camera-feed" autoplay playsinline class="w-full h-full object-cover"></video>
+            <img id="photo-preview" class="hidden w-full h-full object-contain">
+            <video id="video-preview" controls class="hidden w-full h-full object-contain"></video>
+
+            <div id="rec-status" class="hidden absolute top-4 left-4 bg-rose-950/90 border border-rose-900/50 text-rose-200 px-3 py-1 rounded-full text-[11px] font-mono flex items-center gap-2">
+                <div class="w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div> REC <span id="rec-timer">00:00</span>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-center gap-4 py-2">
+            <button id="btn-take-photo" onclick="takePhoto()" class="w-14 h-14 rounded-full bg-white text-noir-900 flex items-center justify-center text-lg shadow-xl transition active:scale-95">
+                <i class="fa-solid fa-camera"></i>
+            </button>
+            <button id="btn-toggle-rec" onclick="toggleVideoRecord()" class="hidden w-14 h-14 rounded-full bg-rose-600 text-white flex items-center justify-center text-lg shadow-xl transition active:scale-95">
+                <i class="fa-solid fa-circle"></i>
+            </button>
+            <button id="btn-save-media" onclick="saveCapturedMedia()" class="hidden py-3 px-6 bg-emerald-800 text-emerald-100 font-medium rounded-xl text-xs flex items-center gap-2">
+                <i class="fa-solid fa-check"></i> Enregistrer
+            </button>
+        </div>
+    </div>
+
+    <!-- IN-GAME GALLERY PICKER MODAL -->
+    <div id="ingame-gallery-modal" class="fixed inset-0 bg-noir-900/95 z-50 hidden flex flex-col justify-between p-5 backdrop-blur-xl">
+        <div class="flex justify-between items-center text-slate-200">
+            <span class="font-serif text-sm">Choisir un souvenir de la galerie</span>
+            <button onclick="closeIngameGalleryModal()" class="w-8 h-8 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+        </div>
+        <div id="ingame-gallery-grid" class="grid grid-cols-2 gap-3 my-4 overflow-y-auto flex-1 pr-1"></div>
+        <div class="text-center text-[11px] text-slate-500">Touchez un média pour l'afficher temporairement sur le défi en cours</div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        const DB_NAME = 'IntimiteDB';
+        const DB_VERSION = 1;
+        let db = null;
+        let activeLightboxMediaId = null;
+
+        function initDB() {
+            return new Promise((resolve) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    db = e.target.result;
+                    if (!db.objectStoreNames.contains('media')) db.createObjectStore('media', { keyPath: 'id' });
+                };
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    loadMediaCount();
+                    resolve(db);
+                };
+            });
+        }
+
+        const defaultChallenges = [
+            // Défis Duo
+            { id: 'def-1', type: 'duo', text: "{giver} chuchote un secret inavouable à l'oreille de {target}.", duration: 0, level: 1, targetGender: 'all', isJoker: false },
+            { id: 'def-2', type: 'duo', text: "{giver} offre un massage relaxant des épaules à {target}.", duration: 120, level: 1, targetGender: 'all', isJoker: false },
+            { id: 'def-3', type: 'duo', text: "{giver} retire un vêtement de {target} en utilisant uniquement les mains.", duration: 60, level: 2, targetGender: 'all', isJoker: false },
+            { id: 'def-4', type: 'duo', text: "{giver} embrasse {target} passionnément sans s'arrêter.", duration: 60, level: 2, targetGender: 'all', isJoker: false },
+            { id: 'def-5', type: 'duo', text: "{giver} explore le corps de {target} des lèvres des pieds jusqu'au cou.", duration: 180, level: 3, targetGender: 'all', isJoker: false },
+            { id: 'joker-def', type: 'duo', text: "✨ {giver} active sa Carte Joker magique ! Immunité totale ou droit d'imposer un gage libre à {target}.", duration: 0, level: 1, targetGender: 'all', isJoker: true },
+            
+            // Défis Solo par défaut
+            { id: 'solo-1', type: 'solo', text: "{player} s'accorde 5 minutes de respiration profonde et d'auto-observation face au miroir.", duration: 300, level: 1, targetGender: 'all', isJoker: false },
+            { id: 'solo-2', type: 'solo', text: "{player} se prépare un moment de détente sensorielle exclusif (bain, musique douce).", duration: 600, level: 1, targetGender: 'all', isJoker: false },
+            { id: 'solo-3', type: 'solo', text: "{player} s'explore avec attention et prend conscience de ses zones de plaisir intimes.", duration: 300, level: 2, targetGender: 'all', isJoker: false },
+            { id: 'solo-4', type: 'solo', text: "{player} se consacre une séance intime torride sans retenue.", duration: 600, level: 3, targetGender: 'all', isJoker: false }
+        ];
+
+        let state = {
+            gameMode: 'duo',
+            p1: 'Partenaire 1', p1Gender: 'male', p1Jokers: 1,
+            p2: 'Partenaire 2', p2Gender: 'female', p2Jokers: 1,
+            soloName: 'Mon Profil', soloGender: 'female',
+            globalDurationMinutes: 2,
+            progressionMode: 'fixed',
+            singleLevel: 1,
+            orderMode: 'sequential',
+            challenges: [],
+            currentIndex: 0,
+            activePlayer: 1,
+            isDimmed: false
+        };
+
+        let activeTimer = null;
+        let cameraStream = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let currentCaptureType = null;
+        let currentBlobData = null;
+        let recInterval = null;
+        let recSeconds = 0;
+        let currentTurnTempMediaId = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await initDB();
+            loadStoredChallenges();
+            updateGlobalDurationDisplay();
+        });
+
+        function setGameMode(mode) {
+            state.gameMode = mode;
+            document.getElementById('btn-mode-duo').className = mode === 'duo' 
+                ? 'py-2.5 px-3 text-xs rounded-xl border border-rose-600/50 bg-rose-950/30 text-rose-200 font-medium transition text-center'
+                : 'py-2.5 px-3 text-xs rounded-xl border border-white/5 bg-noir-900 text-slate-400 font-medium transition text-center';
+            document.getElementById('btn-mode-solo').className = mode === 'solo' 
+                ? 'py-2.5 px-3 text-xs rounded-xl border border-rose-600/50 bg-rose-950/30 text-rose-200 font-medium transition text-center'
+                : 'py-2.5 px-3 text-xs rounded-xl border border-white/5 bg-noir-900 text-slate-400 font-medium transition text-center';
+            
+            document.getElementById('setup-duo-container').classList.toggle('hidden', mode !== 'duo');
+            document.getElementById('setup-solo-container').classList.toggle('hidden', mode !== 'solo');
+        }
+
+        function adjustSetupJokers(playerNum, delta) {
+            if (playerNum === 1) {
+                state.p1Jokers = Math.max(0, Math.min(10, state.p1Jokers + delta));
+                document.getElementById('setup-p1-jokers').innerText = state.p1Jokers;
+            } else {
+                state.p2Jokers = Math.max(0, Math.min(10, state.p2Jokers + delta));
+                document.getElementById('setup-p2-jokers').innerText = state.p2Jokers;
+            }
+        }
+
+        function adjustGlobalDuration(delta) {
+            state.globalDurationMinutes = Math.max(0, Math.min(60, state.globalDurationMinutes + delta));
+            updateGlobalDurationDisplay();
+        }
+
+        function updateGlobalDurationDisplay() {
+            const display = document.getElementById('global-duration-display');
+            if (state.globalDurationMinutes === 0) {
+                display.innerText = 'Désactivé';
+            } else {
+                display.innerText = `${state.globalDurationMinutes} min`;
+            }
+        }
+
+        function loadStoredChallenges() {
+            const saved = localStorage.getItem('intimite_challenges');
+            state.challenges = saved ? JSON.parse(saved) : [...defaultChallenges];
+            if (!saved) saveChallengesToStorage();
+        }
+
+        function saveChallengesToStorage() {
+            localStorage.setItem('intimite_challenges', JSON.stringify(state.challenges));
+            renderBuilderList();
+        }
+
+        function showScreen(screenId) {
+            ['screen-home', 'screen-game', 'screen-game-over', 'screen-builder', 'screen-gallery'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            if (screenId === 'screen-builder') renderBuilderList();
+            if (screenId === 'screen-gallery') renderGallery();
+        }
+
+        function switchBuilderTab(tab) {
+            const btnDuo = document.getElementById('tab-duo');
+            const btnSolo = document.getElementById('tab-solo');
+            const btnJok = document.getElementById('tab-joker');
+            const formDuo = document.getElementById('form-create-duo');
+            const formSolo = document.getElementById('form-create-solo');
+            const formJok = document.getElementById('form-create-joker');
+
+            btnDuo.className = tab === 'duo' ? "py-2 font-medium rounded-xl bg-rose-950/60 text-rose-200 border border-rose-900/40 transition" : "py-2 font-medium rounded-xl text-slate-400 transition";
+            btnSolo.className = tab === 'solo' ? "py-2 font-medium rounded-xl bg-rose-950/60 text-rose-200 border border-rose-900/40 transition" : "py-2 font-medium rounded-xl text-slate-400 transition";
+            btnJok.className = tab === 'joker' ? "py-2 font-medium rounded-xl bg-amber-950/60 text-amber-200 border border-amber-900/40 transition" : "py-2 font-medium rounded-xl text-slate-400 transition";
+
+            formDuo.classList.toggle('hidden', tab !== 'duo');
+            formSolo.classList.toggle('hidden', tab !== 'solo');
+            formJok.classList.toggle('hidden', tab !== 'joker');
+        }
+
+        function setProgressionMode(mode) {
+            state.progressionMode = mode;
+            document.getElementById('btn-mode-fixed').className = mode === 'fixed' 
+                ? 'py-2.5 px-3 text-xs rounded-xl border border-rose-600/50 bg-rose-950/30 text-rose-200 font-medium transition text-center'
+                : 'py-2.5 px-3 text-xs rounded-xl border border-white/5 bg-noir-900 text-slate-400 font-medium transition text-center';
+            document.getElementById('btn-mode-pyramid').className = mode === 'pyramid' 
+                ? 'py-2.5 px-3 text-xs rounded-xl border border-rose-600/50 bg-rose-950/30 text-rose-200 font-medium transition text-center'
+                : 'py-2.5 px-3 text-xs rounded-xl border border-white/5 bg-noir-900 text-slate-400 font-medium transition text-center';
+            document.getElementById('single-level-container').style.display = mode === 'fixed' ? 'block' : 'none';
+        }
+
+        function setOrderMode(mode) {
+            state.orderMode = mode;
+            document.getElementById('btn-order-seq').className = mode === 'sequential' 
+                ? 'py-2.5 px-3 text-xs rounded-xl border border-rose-600/50 bg-rose-950/30 text-rose-200 font-medium transition text-center'
+                : 'py-2.5 px-3 text-xs rounded-xl border border-white/5 bg-noir-900 text-slate-400 font-medium transition text-center';
+            document.getElementById('btn-order-rand').className = mode === 'random' 
+                ? 'py-2.5 px-3 text-xs rounded-xl border border-rose-600/50 bg-rose-950/30 text-rose-200 font-medium transition text-center'
+                : 'py-2.5 px-3 text-xs rounded-xl border border-white/5 bg-noir-900 text-slate-400 font-medium transition text-center';
+        }
+
+        function toggleDimMode() {
+            state.isDimmed = !state.isDimmed;
+            const body = document.getElementById('app-body');
+            body.style.filter = state.isDimmed ? 'brightness(0.6)' : 'none';
+        }
+
+        function startGame() {
+            if (state.gameMode === 'duo') {
+                state.p1 = document.getElementById('p1-name').value || 'Partenaire 1';
+                state.p1Gender = document.getElementById('p1-gender').value;
+                state.p2 = document.getElementById('p2-name').value || 'Partenaire 2';
+                state.p2Gender = document.getElementById('p2-gender').value;
+            } else {
+                state.soloName = document.getElementById('solo-name').value || 'Mon Profil';
+                state.soloGender = document.getElementById('solo-gender').value;
+            }
+
+            state.singleLevel = parseInt(document.getElementById('single-level-select').value);
+            state.currentIndex = 0;
+            state.activePlayer = 1;
+
+            showScreen('screen-game');
+            loadTurnChallenge();
+        }
+
+        function getFilteredChallenges() {
+            return state.challenges.filter(c => {
+                if (state.gameMode === 'solo') {
+                    if (c.type !== 'solo') return false;
+                    const matchLevel = state.progressionMode === 'fixed' ? parseInt(c.level) === state.singleLevel : true;
+                    const matchGender = c.targetGender === 'all' || c.targetGender === state.soloGender;
+                    return matchLevel && matchGender;
+                } else {
+                    if (c.type === 'solo') return false;
+                    if (c.isJoker) return true;
+                    const activeGender = state.activePlayer === 1 ? state.p1Gender : state.p2Gender;
+                    const matchLevel = state.progressionMode === 'fixed' ? parseInt(c.level) === state.singleLevel : true;
+                    const matchGender = c.targetGender === 'all' || c.targetGender === activeGender;
+                    return matchLevel && matchGender;
+                }
+            });
+        }
+
+        function getLevelName(lvl) {
+            if (lvl === 1) return "Doux & Suggestif";
+            if (lvl === 2) return "Piquant & Insolent";
+            if (lvl === 3) return "Torride & Intense";
+            return "Niveau " + lvl;
+        }
+
+        function getCurrentActiveChallenge() {
+            const activeList = getFilteredChallenges();
+            if (activeList.length === 0) return null;
+            return state.orderMode === 'sequential' 
+                ? activeList[state.currentIndex % activeList.length]
+                : activeList[Math.floor(Math.random() * activeList.length)];
+        }
+
+        async function loadTurnChallenge() {
+            document.getElementById('card-inner').classList.remove('flipped');
+            if (activeTimer) clearInterval(activeTimer);
+
+            currentTurnTempMediaId = null;
+
+            const activeList = getFilteredChallenges();
+            
+            if (state.orderMode === 'sequential' && state.currentIndex >= activeList.length) {
+                showScreen('screen-game-over');
+                return;
+            }
+
+            if (activeList.length === 0) {
+                alert("Aucun défi disponible pour ce profil / mode / niveau.");
+                showScreen('screen-home');
+                return;
+            }
+
+            let challenge = getCurrentActiveChallenge();
+            const jokerBtn = document.getElementById('btn-joker');
+
+            if (state.gameMode === 'solo') {
+                const playerName = state.soloName;
+                document.getElementById('current-player-badge').innerText = playerName;
+                document.getElementById('game-level-badge').innerText = getLevelName(challenge.level);
+                document.getElementById('game-progress-count').innerText = `${state.currentIndex + 1}/${activeList.length}`;
+                jokerBtn.classList.add('hidden');
+
+                const parsedText = challenge.text.replace(/{player}/g, playerName);
+                document.getElementById('card-text-display').innerText = parsedText;
+                document.getElementById('card-category-tag').innerText = "👤 SESSION SOLO — " + getLevelName(challenge.level);
+            } else {
+                const giver = state.activePlayer === 1 ? state.p1 : state.p2;
+                const target = state.activePlayer === 1 ? state.p2 : state.p1;
+                const currentJokers = state.activePlayer === 1 ? state.p1Jokers : state.p2Jokers;
+
+                document.getElementById('current-player-badge').innerText = giver;
+                document.getElementById('game-level-badge').innerText = challenge.isJoker ? "CARTE JOKER" : getLevelName(challenge.level);
+                document.getElementById('game-progress-count').innerText = `${state.currentIndex + 1}/${activeList.length}`;
+
+                if (currentJokers > 0) {
+                    jokerBtn.classList.remove('hidden');
+                    document.getElementById('joker-count').innerText = currentJokers;
+                } else {
+                    jokerBtn.classList.add('hidden');
+                }
+
+                const parsedText = challenge.text.replace(/{giver}/g, giver).replace(/{target}/g, target);
+                document.getElementById('card-text-display').innerText = parsedText;
+                document.getElementById('card-category-tag').innerText = challenge.isJoker ? "⚡ JOKER SPÉCIAL" : getLevelName(challenge.level);
+            }
+
+            let effectiveDurationInSeconds = 0;
+            if (!challenge.isJoker) {
+                if (challenge.duration > 0) {
+                    effectiveDurationInSeconds = challenge.duration;
+                } else if (state.globalDurationMinutes > 0) {
+                    effectiveDurationInSeconds = state.globalDurationMinutes * 60;
+                }
+            }
+
+            const timerContainer = document.getElementById('card-timer-container');
+            const timerAction = document.getElementById('timer-action-container');
+            if (effectiveDurationInSeconds > 0) {
+                timerContainer.classList.remove('hidden');
+                timerAction.classList.remove('hidden');
+                document.getElementById('timer-display').innerText = formatSeconds(effectiveDurationInSeconds);
+                document.getElementById('btn-start-timer').dataset.duration = effectiveDurationInSeconds;
+                document.getElementById('btn-start-timer').disabled = false;
+                document.getElementById('btn-start-timer').innerHTML = `<i class="fa-solid fa-play"></i> Démarrer le chronomètre (${Math.round(effectiveDurationInSeconds / 60)} min)`;
+            } else {
+                timerContainer.classList.add('hidden');
+                timerAction.classList.add('hidden');
+            }
+
+            const mediaContainer = document.getElementById('card-media-preview');
+            mediaContainer.innerHTML = '';
+
+            if (challenge.mediaId) {
+                const media = await loadMediaFromDB(challenge.mediaId);
+                if (media) {
+                    mediaContainer.classList.remove('hidden');
+                    mediaContainer.innerHTML = media.type.startsWith('video') 
+                        ? `<video src="${media.url}" controls class="w-full h-32 object-cover rounded-xl"></video>`
+                        : `<img src="${media.url}" class="w-full h-32 object-cover rounded-xl">`;
+                } else {
+                    mediaContainer.classList.add('hidden');
+                }
+            } else {
+                mediaContainer.classList.add('hidden');
+            }
+        }
+
+        async function openInGameGalleryPicker() {
+            const grid = document.getElementById('ingame-gallery-grid');
+            grid.innerHTML = '';
+            const items = await loadAllMediaFromDB();
+
+            if (items.length === 0) {
+                grid.innerHTML = `<p class="col-span-2 text-center text-xs text-slate-500 py-6">La galerie de l'application est vide pour le moment.</p>`;
+            } else {
+                items.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'relative group rounded-xl overflow-hidden border border-white/5 bg-noir-800 aspect-square cursor-pointer hover:border-rose-500 transition';
+                    el.innerHTML = item.type.startsWith('video')
+                        ? `<video src="${item.url}" class="w-full h-full object-cover"></video><div class="absolute inset-0 bg-black/30 flex items-center justify-center"><i class="fa-solid fa-play text-white text-xs"></i></div>`
+                        : `<img src="${item.url}" class="w-full h-full object-cover">`;
+                    
+                    el.onclick = () => attachTempMediaToCurrentChallenge(item.id, item.url, item.type);
+                    grid.appendChild(el);
+                });
+            }
+
+            document.getElementById('ingame-gallery-modal').classList.remove('hidden');
+        }
+
+        function attachTempMediaToCurrentChallenge(mediaId, url, type) {
+            currentTurnTempMediaId = mediaId;
+            const mediaContainer = document.getElementById('card-media-preview');
+            mediaContainer.classList.remove('hidden');
+            mediaContainer.innerHTML = type.startsWith('video')
+                ? `<video src="${url}" controls class="w-full h-32 object-cover rounded-xl"></video>`
+                : `<img src="${url}" class="w-full h-32 object-cover rounded-xl">`;
+            closeIngameGalleryModal();
+        }
+
+        function closeIngameGalleryModal() {
+            document.getElementById('ingame-gallery-modal').classList.add('hidden');
+        }
+
+        function revealCard() {
+            document.getElementById('card-inner').classList.add('flipped');
+        }
+
+        function useJoker() {
+            if (state.gameMode === 'solo') return;
+            if (state.activePlayer === 1) state.p1Jokers--;
+            else state.p2Jokers--;
+
+            const jokerCards = state.challenges.filter(c => c.isJoker);
+            const chosenJoker = jokerCards.length > 0 
+                ? jokerCards[Math.floor(Math.random() * jokerCards.length)]
+                : { text: "✨ {giver} active sa Carte Joker magique ! Gage libre ou immunité.", isJoker: true };
+
+            const giver = state.activePlayer === 1 ? state.p1 : state.p2;
+            const target = state.activePlayer === 1 ? state.p2 : state.p1;
+
+            document.getElementById('card-inner').classList.remove('flipped');
+            if (activeTimer) clearInterval(activeTimer);
+
+            const parsedText = chosenJoker.text.replace(/{giver}/g, giver).replace(/{target}/g, target);
+            document.getElementById('card-text-display').innerText = parsedText;
+            document.getElementById('card-category-tag').innerText = "⚡ CARTE JOKER ACTIVÉE";
+            document.getElementById('card-timer-container').classList.add('hidden');
+            document.getElementById('timer-action-container').classList.add('hidden');
+            document.getElementById('card-media-preview').classList.add('hidden');
+            document.getElementById('btn-joker').classList.add('hidden');
+
+            setTimeout(() => {
+                revealCard();
+            }, 100);
+        }
+
+        function nextTurn() {
+            currentTurnTempMediaId = null;
+            state.currentIndex++;
+            if (state.gameMode === 'duo') {
+                state.activePlayer = state.activePlayer === 1 ? 2 : 1;
+            }
+            loadTurnChallenge();
+        }
+
+        function playEndBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } catch(e) {
+                // Ignore
+            }
+        }
+
+        function startTimer() {
+            const btn = document.getElementById('btn-start-timer');
+            let duration = parseInt(btn.dataset.duration);
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Décompte en cours...`;
+
+            activeTimer = setInterval(() => {
+                duration--;
+                document.getElementById('timer-display').innerText = formatSeconds(duration);
+                if (duration <= 0) {
+                    clearInterval(activeTimer);
+                    document.getElementById('timer-display').innerText = "TERMINÉ !";
+                    btn.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> Temps écoulé !`;
+                    playEndBeep();
+                }
+            }, 1000);
+        }
+
+        function formatSeconds(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function editChallenge(id) {
+            const challenge = state.challenges.find(c => c.id === id);
+            if (!challenge) return;
+
+            if (challenge.isJoker) {
+                switchBuilderTab('joker');
+                document.getElementById('joker-text-input').value = challenge.text;
+                const form = document.getElementById('form-create-joker');
+                form.dataset.editId = id;
+                form.querySelector('button[type="submit"]').innerText = "Modifier la Carte Joker";
+                document.getElementById('btn-cancel-edit-joker').classList.remove('hidden');
+            } else if (challenge.type === 'solo') {
+                switchBuilderTab('solo');
+                document.getElementById('solo-text-input').value = challenge.text;
+                document.getElementById('solo-target-gender').value = challenge.targetGender || 'all';
+                document.getElementById('solo-duration-minutes').value = challenge.duration ? challenge.duration / 60 : 0;
+                document.getElementById('solo-level').value = challenge.level || 1;
+                const form = document.getElementById('form-create-solo');
+                form.dataset.editId = id;
+                form.querySelector('button[type="submit"]').innerText = "Modifier le défi Solo";
+                document.getElementById('btn-cancel-edit-solo').classList.remove('hidden');
+            } else {
+                switchBuilderTab('duo');
+                document.getElementById('duo-text-input').value = challenge.text;
+                document.getElementById('duo-target-gender').value = challenge.targetGender || 'all';
+                document.getElementById('duo-duration-minutes').value = challenge.duration ? challenge.duration / 60 : 0;
+                document.getElementById('duo-level').value = challenge.level || 1;
+                const form = document.getElementById('form-create-duo');
+                form.dataset.editId = id;
+                form.querySelector('button[type="submit"]').innerText = "Modifier le défi Duo";
+                document.getElementById('btn-cancel-edit-duo').classList.remove('hidden');
+            }
+        }
+
+        function cancelEdit(type) {
+            if (type === 'duo') {
+                const form = document.getElementById('form-create-duo');
+                delete form.dataset.editId;
+                form.reset();
+                form.querySelector('button[type="submit"]').innerText = "Ajouter le défi Duo";
+                document.getElementById('btn-cancel-edit-duo').classList.add('hidden');
+            } else if (type === 'solo') {
+                const form = document.getElementById('form-create-solo');
+                delete form.dataset.editId;
+                form.reset();
+                form.querySelector('button[type="submit"]').innerText = "Ajouter le défi Solo";
+                document.getElementById('btn-cancel-edit-solo').classList.add('hidden');
+            } else if (type === 'joker') {
+                const form = document.getElementById('form-create-joker');
+                delete form.dataset.editId;
+                form.reset();
+                form.querySelector('button[type="submit"]').innerText = "Créer la Carte Joker";
+                document.getElementById('btn-cancel-edit-joker').classList.add('hidden');
+            }
+        }
+
+        async function saveCustomChallenge(event, type) {
+            event.preventDefault();
+            const form = event.target;
+            const editId = form.dataset.editId;
+
+            if (type === 'duo') {
+                const text = document.getElementById('duo-text-input').value;
+                const targetGender = document.getElementById('duo-target-gender').value;
+                const durationMinutes = parseInt(document.getElementById('duo-duration-minutes').value) || 0;
+                const level = parseInt(document.getElementById('duo-level').value);
+                const mediaFile = document.getElementById('duo-media-file').files[0];
+
+                let mediaId = null;
+                if (mediaFile) {
+                    mediaId = 'med-' + Date.now();
+                    const url = URL.createObjectURL(mediaFile);
+                    await saveMediaToDB({ id: mediaId, url: url, type: mediaFile.type, timestamp: Date.now() });
+                }
+
+                if (editId) {
+                    const index = state.challenges.findIndex(c => c.id === editId);
+                    if (index !== -1) {
+                        state.challenges[index].text = text;
+                        state.challenges[index].targetGender = targetGender;
+                        state.challenges[index].duration = durationMinutes * 60;
+                        state.challenges[index].level = level;
+                        if (mediaId) state.challenges[index].mediaId = mediaId;
+                    }
+                    delete form.dataset.editId;
+                    form.querySelector('button[type="submit"]').innerText = "Ajouter le défi Duo";
+                    document.getElementById('btn-cancel-edit-duo').classList.add('hidden');
+                } else {
+                    const newChallenge = {
+                        id: 'custom-duo-' + Date.now(),
+                        type: 'duo',
+                        text: text,
+                        duration: durationMinutes * 60,
+                        level: level,
+                        targetGender: targetGender,
+                        isJoker: false,
+                        mediaId: mediaId
+                    };
+                    state.challenges.push(newChallenge);
+                }
+                form.reset();
+            } else {
+                const text = document.getElementById('solo-text-input').value;
+                const targetGender = document.getElementById('solo-target-gender').value;
+                const durationMinutes = parseInt(document.getElementById('solo-duration-minutes').value) || 0;
+                const level = parseInt(document.getElementById('solo-level').value);
+                const mediaFile = document.getElementById('solo-media-file').files[0];
+
+                let mediaId = null;
+                if (mediaFile) {
+                    mediaId = 'med-' + Date.now();
+                    const url = URL.createObjectURL(mediaFile);
+                    await saveMediaToDB({ id: mediaId, url: url, type: mediaFile.type, timestamp: Date.now() });
+                }
+
+                if (editId) {
+                    const index = state.challenges.findIndex(c => c.id === editId);
+                    if (index !== -1) {
+                        state.challenges[index].text = text;
+                        state.challenges[index].targetGender = targetGender;
+                        state.challenges[index].duration = durationMinutes * 60;
+                        state.challenges[index].level = level;
+                        if (mediaId) state.challenges[index].mediaId = mediaId;
+                    }
+                    delete form.dataset.editId;
+                    form.querySelector('button[type="submit"]').innerText = "Ajouter le défi Solo";
+                    document.getElementById('btn-cancel-edit-solo').classList.add('hidden');
+                } else {
+                    const newChallenge = {
+                        id: 'custom-solo-' + Date.now(),
+                        type: 'solo',
+                        text: text,
+                        duration: durationMinutes * 60,
+                        level: level,
+                        targetGender: targetGender,
+                        isJoker: false,
+                        mediaId: mediaId
+                    };
+                    state.challenges.push(newChallenge);
+                }
+                form.reset();
+            }
+
+            saveChallengesToStorage();
+            alert("Défi enregistré avec succès !");
+        }
+
+        async function saveCustomJoker(event) {
+            event.preventDefault();
+            const form = event.target;
+            const editId = form.dataset.editId;
+            const text = document.getElementById('joker-text-input').value;
+
+            if (editId) {
+                const index = state.challenges.findIndex(c => c.id === editId);
+                if (index !== -1) {
+                    state.challenges[index].text = text;
+                }
+                delete form.dataset.editId;
+                form.querySelector('button[type="submit"]').innerText = "Créer la Carte Joker";
+                document.getElementById('btn-cancel-edit-joker').classList.add('hidden');
+            } else {
+                const newJoker = {
+                    id: 'joker-' + Date.now(),
+                    type: 'duo',
+                    text: text,
+                    duration: 0,
+                    level: 1,
+                    targetGender: 'all',
+                    isJoker: true,
+                    mediaId: null
+                };
+                state.challenges.push(newJoker);
+            }
+
+            saveChallengesToStorage();
+            form.reset();
+            alert("Carte Joker enregistrée avec succès !");
+        }
+
+        function renderBuilderList() {
+            const container = document.getElementById('challenges-list');
+            document.getElementById('challenges-count').innerText = state.challenges.length;
+            container.innerHTML = '';
+
+            state.challenges.forEach((item) => {
+                let badgeLabel = "👥 Duo";
+                let badgeColor = "bg-rose-950/60 text-rose-300 border-rose-900/40";
+
+                if (item.isJoker) {
+                    badgeLabel = "⚡ Joker";
+                    badgeColor = "bg-amber-950/60 text-amber-300 border-amber-900/40";
+                } else if (item.type === 'solo') {
+                    badgeLabel = "👤 Solo";
+                    badgeColor = "bg-purple-950/60 text-purple-300 border-purple-900/40";
+                }
+                
+                const el = document.createElement('div');
+                el.className = 'p-3 bg-noir-800 border border-white/5 rounded-2xl flex items-center justify-between text-xs';
+                el.innerHTML = `
+                    <div class="space-y-1 flex-1 pr-2">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 text-[10px] rounded border ${badgeColor}">${badgeLabel} (${getLevelName(item.level)})</span>
+                        </div>
+                        <p class="text-slate-200 line-clamp-1">${item.text}</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="editChallenge('${item.id}')" class="text-slate-400 hover:text-rose-300 p-2" title="Modifier">
+                            <i class="fa-solid fa-pen text-xs"></i>
+                        </button>
+                        <button onclick="deleteChallenge('${item.id}')" class="text-slate-500 hover:text-rose-400 p-2" title="Supprimer">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function deleteChallenge(id) {
+            state.challenges = state.challenges.filter(c => c.id !== id);
+            saveChallengesToStorage();
+        }
+
+        function clearAllChallenges() {
+            if (confirm("Réinitialiser tous les défis par défaut ?")) {
+                state.challenges = [...defaultChallenges];
+                saveChallengesToStorage();
+            }
+        }
+
+        // Sauvegarde globale complète (Défis + Galerie IndexedDB)
+        async function exportFullBackup() {
+            const mediaItems = await loadAllMediaFromDB();
+            const backupData = {
+                challenges: state.challenges,
+                media: mediaItems,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `intimite_sauvegarde_totale_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Restauration globale complète
+        async function importFullBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    if (backup.challenges && Array.isArray(backup.challenges)) {
+                        state.challenges = backup.challenges;
+                        saveChallengesToStorage();
+                    }
+                    if (backup.media && Array.isArray(backup.media)) {
+                        for (const m of backup.media) {
+                            await saveMediaToDB(m);
+                        }
+                    }
+                    alert("Restauration complète effectuée avec succès !");
+                } catch(err) {
+                    alert("Erreur lors de la lecture du fichier de sauvegarde.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function saveMediaToDB(mediaObj) {
+            return new Promise((resolve) => {
+                const tx = db.transaction('media', 'readwrite');
+                const store = tx.objectStore('media');
+                store.put(mediaObj);
+                tx.oncomplete = () => {
+                    loadMediaCount();
+                    resolve();
+                };
+            });
+        }
+
+        function loadMediaFromDB(id) {
+            return new Promise((resolve) => {
+                const tx = db.transaction('media', 'readonly');
+                const store = tx.objectStore('media');
+                const req = store.get(id);
+                req.onsuccess = () => resolve(req.result);
+            });
+        }
+
+        function loadAllMediaFromDB() {
+            return new Promise((resolve) => {
+                const tx = db.transaction('media', 'readonly');
+                const store = tx.objectStore('media');
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result);
+            });
+        }
+
+        function deleteMediaFromDB(id) {
+            return new Promise((resolve) => {
+                const tx = db.transaction('media', 'readwrite');
+                const store = tx.objectStore('media');
+                store.delete(id);
+                tx.oncomplete = () => {
+                    loadMediaCount();
+                    resolve();
+                };
+            });
+        }
+
+        function loadMediaCount() {
+            if (!db) return;
+            const tx = db.transaction('media', 'readonly');
+            const store = tx.objectStore('media');
+            const req = store.count();
+            req.onsuccess = () => {
+                const badge = document.getElementById('media-badge');
+                if (req.result > 0) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            };
+        }
+
+        async function openMediaCapture(type) {
+            currentCaptureType = type;
+            recordedChunks = [];
+            currentBlobData = null;
+            document.getElementById('media-modal').classList.remove('hidden');
+            document.getElementById('photo-preview').classList.add('hidden');
+            document.getElementById('video-preview').classList.add('hidden');
+            document.getElementById('camera-feed').classList.remove('hidden');
+
+            document.getElementById('btn-take-photo').style.display = type === 'photo' ? 'flex' : 'none';
+            document.getElementById('btn-toggle-rec').style.display = type === 'video' ? 'flex' : 'none';
+            document.getElementById('btn-save-media').classList.add('hidden');
+
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: type === 'video' });
+                document.getElementById('camera-feed').srcObject = cameraStream;
+            } catch (err) {
+                alert("Accès caméra indisponible ou refusé.");
+                closeMediaModal();
+            }
+        }
+
+        function closeMediaModal() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+            }
+            if (recInterval) clearInterval(recInterval);
+            document.getElementById('media-modal').classList.add('hidden');
+            document.getElementById('rec-status').classList.add('hidden');
+        }
+
+        function takePhoto() {
+            const video = document.getElementById('camera-feed');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            currentBlobData = { type: 'image/jpeg', url: dataUrl };
+
+            const preview = document.getElementById('photo-preview');
+            preview.src = dataUrl;
+            preview.classList.remove('hidden');
+            video.classList.add('hidden');
+
+            document.getElementById('btn-take-photo').style.display = 'none';
+            document.getElementById('btn-save-media').classList.remove('hidden');
+        }
+
+        function toggleVideoRecord() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                clearInterval(recInterval);
+                document.getElementById('rec-status').classList.add('hidden');
+                document.getElementById('btn-toggle-rec').innerHTML = `<i class="fa-solid fa-circle"></i>`;
+            } else {
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(cameraStream);
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+                    const url = URL.createObjectURL(blob);
+                    currentBlobData = { type: 'video/mp4', url: url };
+
+                    const preview = document.getElementById('video-preview');
+                    preview.src = url;
+                    preview.classList.remove('hidden');
+                    document.getElementById('camera-feed').classList.add('hidden');
+
+                    document.getElementById('btn-toggle-rec').style.display = 'none';
+                    document.getElementById('btn-save-media').classList.remove('hidden');
+                };
+                mediaRecorder.start();
+
+                recSeconds = 0;
+                document.getElementById('rec-status').classList.remove('hidden');
+                document.getElementById('btn-toggle-rec').innerHTML = `<i class="fa-solid fa-square"></i>`;
+                recInterval = setInterval(() => {
+                    recSeconds++;
+                    document.getElementById('rec-timer').innerText = formatSeconds(recSeconds);
+                }, 1000);
+            }
+        }
+
+        async function saveCapturedMedia() {
+            if (currentBlobData) {
+                const mediaId = 'media-' + Date.now();
+                await saveMediaToDB({
+                    id: mediaId,
+                    url: currentBlobData.url,
+                    type: currentBlobData.type,
+                    timestamp: Date.now()
+                });
+
+                currentTurnTempMediaId = mediaId;
+                const mediaContainer = document.getElementById('card-media-preview');
+                mediaContainer.classList.remove('hidden');
+                mediaContainer.innerHTML = currentBlobData.type.startsWith('video')
+                    ? `<video src="${currentBlobData.url}" controls class="w-full h-32 object-cover rounded-xl"></video>`
+                    : `<img src="${currentBlobData.url}" class="w-full h-32 object-cover rounded-xl">`;
+
+                closeMediaModal();
+            }
+        }
+
+        async function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = '';
+            const pathItems = await loadAllMediaFromDB();
+
+            if (pathItems.length === 0) {
+                grid.innerHTML = `<p class="col-span-3 text-center text-xs text-slate-500 py-8">Aucun souvenir capturé pour le moment.</p>`;
+                return;
+            }
+
+            pathItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'relative group rounded-xl overflow-hidden border border-white/5 bg-noir-800 aspect-square cursor-pointer hover:border-rose-500 transition';
+                card.innerHTML = item.type.startsWith('video')
+                    ? `<video src="${item.url}" class="w-full h-full object-cover pointer-events-none"></video><div class="absolute inset-0 bg-black/30 flex items-center justify-center"><i class="fa-solid fa-play text-white text-xs"></i></div>`
+                    : `<img src="${item.url}" class="w-full h-full object-cover">`;
+                
+                card.onclick = () => openLightbox(item);
+                grid.appendChild(card);
+            });
+        }
+
+        function openLightbox(item) {
+            activeLightboxMediaId = item.id;
+            const content = document.getElementById('lightbox-content');
+            content.innerHTML = item.type.startsWith('video')
+                ? `<video src="${item.url}" controls autoplay class="w-full h-full object-contain"></video>`
+                : `<img src="${item.url}" class="w-full h-full object-contain">`;
+            document.getElementById('lightbox-modal').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            activeLightboxMediaId = null;
+            document.getElementById('lightbox-modal').classList.add('hidden');
+        }
+
+        async function deleteCurrentLightboxMedia() {
+            if (activeLightboxMediaId && confirm("Voulez-vous vraiment supprimer ce souvenir de votre galerie ?")) {
+                await deleteMediaFromDB(activeLightboxMediaId);
+                closeLightbox();
+                renderGallery();
+            }
+        }
+    </script>
+</body>
+</html>
