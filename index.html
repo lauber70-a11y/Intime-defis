@@ -79,6 +79,13 @@
             <button onclick="toggleDimMode()" id="dim-btn" title="Lumière tamisée" class="w-10 h-10 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-rose-300 flex items-center justify-center transition">
                 <i class="fa-solid fa-moon text-xs"></i>
             </button>
+            <button onclick="showScreen('screen-jukebox')" title="Juke-box de l'ambiance" class="w-10 h-10 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-rose-300 flex items-center justify-center transition relative">
+                <i class="fa-solid fa-music text-xs"></i>
+                <span id="jukebox-badge" class="hidden absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+            </button>
+            <button onclick="showScreen('screen-kamasutra')" title="Kamasutra" class="w-10 h-10 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-rose-300 flex items-center justify-center transition">
+                <i class="fa-solid fa-book-bookmark text-xs"></i>
+            </button>
             <button onclick="showScreen('screen-gallery')" title="Galerie" class="w-10 h-10 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-rose-300 flex items-center justify-center transition relative">
                 <i class="fa-solid fa-photo-film text-xs"></i>
                 <span id="media-badge" class="hidden absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full"></span>
@@ -157,7 +164,7 @@
                     </div>
                 </div>
 
-                <!-- Section Configuration Solo (Caché par défaut) -->
+                <!-- Section Configuration Solo -->
                 <div id="setup-solo-container" class="hidden space-y-3">
                     <div class="bg-noir-900/60 p-3.5 rounded-2xl border border-white/5 space-y-2">
                         <label class="text-[11px] font-semibold tracking-wider uppercase text-rose-300/80 block">Joueur en Solo</label>
@@ -169,18 +176,38 @@
                                 <option value="neutral">👤 Mixte</option>
                             </select>
                         </div>
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="text-[11px] text-slate-400">Jokers solo initiaux :</span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="adjustSetupJokers('solo', -1)" class="w-6 h-6 rounded bg-noir-800 border border-white/10 text-amber-300 flex items-center justify-center text-xs">-</button>
+                                <span id="setup-solo-jokers" class="text-xs font-mono font-bold text-amber-300 min-w-[20px] text-center">1</span>
+                                <button type="button" onclick="adjustSetupJokers('solo', 1)" class="w-6 h-6 rounded bg-noir-800 border border-white/10 text-amber-300 flex items-center justify-center text-xs">+</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Réglage global de la durée par défi (Minutes) -->
+                <!-- Option Règle : Sous-vêtements obligatoires -->
+                <div class="bg-noir-900/60 p-3.5 rounded-2xl border border-white/5 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-rose-200 block">Règle : Sous-vêtements obligatoires</span>
+                        <span class="text-[10px] text-slate-400 block">Affiche un badge de rappel permanent pendant la partie</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="setup-underwear-rule" checked class="sr-only peer">
+                        <div class="w-9 h-5 bg-noir-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-700"></div>
+                    </label>
+                </div>
+
+                <!-- Réglage global de la durée par défi -->
                 <div class="space-y-2">
                     <label class="text-[11px] font-semibold tracking-wider uppercase text-rose-300/80 block">Durée globale par défi</label>
                     <div class="bg-noir-900/60 p-3 rounded-2xl border border-white/5 flex items-center justify-between">
                         <span class="text-xs text-slate-300 font-medium">Temps alloué :</span>
                         <div class="flex items-center gap-3">
-                            <button type="button" onclick="adjustGlobalDuration(-1)" class="w-8 h-8 rounded-lg bg-noir-800 border border-white/10 text-rose-300 hover:bg-rose-950/40 flex items-center justify-center font-bold text-sm transition">-</button>
-                            <span id="global-duration-display" class="text-xs font-mono font-bold text-rose-200 min-w-[60px] text-center">2 min</span>
-                            <button type="button" onclick="adjustGlobalDuration(1)" class="w-8 h-8 rounded-lg bg-noir-800 border border-white/10 text-rose-300 hover:bg-rose-950/40 flex items-center justify-center font-bold text-sm transition">+</button>
+                            <button type="button" onclick="adjustGlobalDuration(-10)" class="w-8 h-8 rounded-lg bg-noir-800 border border-white/10 text-rose-300 hover:bg-rose-950/40 flex items-center justify-center font-bold text-sm transition">-</button>
+                            <span id="global-duration-display" class="text-xs font-mono font-bold text-rose-200 min-w-[60px] text-center">120 s</span>
+                            <button type="button" onclick="adjustGlobalDuration(10)" class="w-8 h-8 rounded-lg bg-noir-800 border border-white/10 text-rose-300 hover:bg-rose-950/40 flex items-center justify-center font-bold text-sm transition">+</button>
                         </div>
                     </div>
                 </div>
@@ -222,19 +249,143 @@
             </div>
 
             <!-- Start Button -->
-            <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-rose-700 to-rose-900 hover:from-rose-600 hover:to-rose-800 text-white font-medium rounded-2xl shadow-xl shadow-rose-950/40 text-sm tracking-wider uppercase flex items-center justify-center gap-3 transition active:scale-98">
+            <button onclick="prepareGame()" class="w-full py-4 bg-gradient-to-r from-rose-700 to-rose-900 hover:from-rose-600 hover:to-rose-800 text-white font-medium rounded-2xl shadow-xl shadow-rose-950/40 text-sm tracking-wider uppercase flex items-center justify-center gap-3 transition active:scale-98">
                 <span>Lancer la session</span>
                 <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
         </section>
 
+        <!-- SCREEN: RULES / RÈGLES DU JEU -->
+        <section id="screen-rules" class="hidden space-y-6">
+            <div class="space-y-1 text-center py-2">
+                <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-950/60 border border-rose-900/50 flex items-center justify-center text-rose-300 text-lg shadow-lg mb-3">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <h2 class="font-serif text-2xl font-normal text-rose-50">Règles de la session</h2>
+                <p class="text-xs text-slate-400">Quelques principes avant de révéler les cartes</p>
+            </div>
+
+            <div class="bg-noir-800/90 border border-white/5 p-5 rounded-3xl shadow-2xl space-y-4 backdrop-blur-md text-xs text-slate-300 leading-relaxed">
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-lg bg-rose-950/80 text-rose-300 flex items-center justify-center shrink-0 font-bold">1</div>
+                    <p><strong class="text-rose-200">Consentement & Douceur :</strong> Chaque défi s'effectue dans le respect. Refuser un défi ou se tromper à un quiz déclenche l'écran de défaite.</p>
+                </div>
+                <div id="rule-underwear-notice" class="hidden flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-lg bg-rose-950/80 text-rose-300 flex items-center justify-center shrink-0 font-bold">2</div>
+                    <p><strong class="text-rose-200">Règle vestimentaire :</strong> Sous-vêtements obligatoires pour la partenaire pendant toute la session.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-lg bg-rose-950/80 text-rose-300 flex items-center justify-center shrink-0 font-bold">3</div>
+                    <p><strong class="text-rose-200">Le Suspense :</strong> Touchez la carte mystère pour découvrir le gage de votre tour. Validez ou répondez au quiz.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-lg bg-amber-950/80 text-amber-300 flex items-center justify-center shrink-0 font-bold">4</div>
+                    <p><strong class="text-amber-200">Les Jokers :</strong> Vous disposez de jokers pour vous immuniser ou changer de gage en cours de route.</p>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="startGameFromRules()" class="w-full py-4 bg-gradient-to-r from-rose-700 to-rose-900 hover:from-rose-600 hover:to-rose-800 text-white font-medium rounded-2xl shadow-xl shadow-rose-950/40 text-sm tracking-wider uppercase flex items-center justify-center gap-3 transition active:scale-98">
+                    <span>C'est parti !</span>
+                    <i class="fa-solid fa-play text-xs"></i>
+                </button>
+                <button onclick="showScreen('screen-home')" class="w-full py-2 text-xs text-slate-500 hover:text-slate-300 transition text-center">
+                    Retour aux paramètres
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN: JUKEBOX DE L'AMBIANCE -->
+        <section id="screen-jukebox" class="hidden space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-serif text-lg font-medium text-rose-50">Juke-box de l'ambiance</h2>
+                    <p class="text-xs text-slate-400">Ambiances sonores feutrées pour vos sessions</p>
+                </div>
+                <button onclick="showScreen('screen-home')" class="w-8 h-8 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div class="p-4 bg-noir-800/90 border border-white/5 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-950/40 border border-amber-900/30 flex items-center justify-center text-amber-300">
+                            <i class="fa-solid fa-fire text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-semibold text-amber-100">Feu de cheminée</h4>
+                            <p class="text-[10px] text-slate-400">Crépitements chaleureux et doux</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleAmbientSound('fire')" id="btn-sound-fire" class="py-2 px-4 rounded-xl bg-noir-900 border border-white/10 text-xs font-medium text-slate-300 hover:border-amber-500 transition">
+                        Activer
+                    </button>
+                </div>
+
+                <div class="p-4 bg-noir-800/90 border border-white/5 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-sky-950/40 border border-sky-900/30 flex items-center justify-center text-sky-300">
+                            <i class="fa-solid fa-cloud-rain text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-semibold text-sky-100">Pluie nocturne</h4>
+                            <p class="text-[10px] text-slate-400">Gouttes apaisantes sur vitre</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleAmbientSound('rain')" id="btn-sound-rain" class="py-2 px-4 rounded-xl bg-noir-900 border border-white/10 text-xs font-medium text-slate-300 hover:border-sky-500 transition">
+                        Activer
+                    </button>
+                </div>
+
+                <div class="p-4 bg-noir-800/90 border border-white/5 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-950/40 border border-purple-900/30 flex items-center justify-center text-purple-300">
+                            <i class="fa-solid fa-moon text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-semibold text-purple-100">Bourdonnement cosmique</h4>
+                            <p class="text-[10px] text-slate-400">Nappe sonore profonde et feutrée</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleAmbientSound('cosmic')" id="btn-sound-cosmic" class="py-2 px-4 rounded-xl bg-noir-900 border border-white/10 text-xs font-medium text-slate-300 hover:border-purple-500 transition">
+                        Activer
+                    </button>
+                </div>
+
+                <div class="pt-2 text-center">
+                    <button onclick="stopAllAmbientSounds()" class="py-2.5 px-6 bg-rose-950/40 border border-rose-900/60 text-rose-200 text-xs font-medium rounded-xl hover:bg-rose-900/40 transition">
+                        Couper tous les sons
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: KAMASUTRA BANK -->
+        <section id="screen-kamasutra" class="hidden space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-serif text-lg font-medium text-rose-50">Banque Kamasutra</h2>
+                    <p class="text-xs text-slate-400">Positions et inspirations intimes</p>
+                </div>
+                <button onclick="showScreen('screen-home')" class="w-8 h-8 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <div id="kamasutra-list" class="space-y-3 max-h-[440px] overflow-y-auto pr-1"></div>
+        </section>
+
         <!-- SCREEN 2: GAMEPLAY -->
         <section id="screen-game" class="hidden space-y-4">
             <!-- Header bar -->
-            <div class="bg-noir-800/80 border border-white/5 px-4 py-3 rounded-2xl flex items-center justify-between text-xs">
-                <div class="flex items-center gap-2">
+            <div class="bg-noir-800/80 border border-white/5 px-4 py-3 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2 flex-wrap">
                     <span id="current-player-badge" class="px-2.5 py-1 bg-rose-950/80 text-rose-200 rounded-lg font-semibold border border-rose-900/50"></span>
                     <span id="game-level-badge" class="text-slate-400 text-[11px]"></span>
+                    <span id="game-underwear-badge" class="hidden px-2 py-1 bg-rose-900/40 text-rose-300 border border-rose-700/50 rounded-lg text-[10px] font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-shield-heart"></i> Sous-vêtements obligatoires
+                    </span>
                 </div>
                 <div class="flex items-center gap-3">
                     <button id="btn-joker" onclick="useJoker()" title="Utiliser son Joker" class="hidden px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg font-semibold transition hover:bg-amber-500/30 flex items-center gap-1">
@@ -259,7 +410,7 @@
 
                     <!-- Card Back -->
                     <div class="card-face card-back absolute inset-0 bg-noir-800 border border-white/10 rounded-3xl p-6 flex flex-col justify-between overflow-y-auto">
-                        <div class="space-y-4">
+                        <div class="space-y-3">
                             <div class="flex justify-between items-center">
                                 <span id="card-category-tag" class="text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-md bg-rose-950/60 text-rose-300 border border-rose-900/40 font-medium"></span>
                                 <span id="card-timer-container" class="hidden text-xs font-mono font-semibold text-rose-400 flex items-center gap-1.5 bg-noir-900 px-2.5 py-1 rounded-lg border border-white/5">
@@ -267,31 +418,58 @@
                                 </span>
                             </div>
 
-                            <p id="card-text-display" class="text-sm md:text-base text-slate-100 font-normal leading-relaxed pt-2"></p>
+                            <!-- En-tête si la carte précédente a laissé une réponse -->
+                            <div id="pending-previous-answer-box" class="hidden p-3 bg-purple-950/50 border border-purple-500/40 rounded-2xl space-y-1">
+                                <span class="text-[10px] tracking-wider uppercase text-purple-300 font-bold block"><i class="fa-solid fa-comment-dots"></i> Réponse précédente</span>
+                                <p id="pending-previous-answer-text" class="text-xs text-purple-100 font-medium italic"></p>
+                            </div>
+
+                            <p id="card-text-display" class="text-sm text-slate-100 font-normal leading-relaxed"></p>
+
+                            <!-- Conteneur Questionnaire / Quiz / Réponse Libre -->
+                            <div id="card-interactive-container" class="hidden space-y-2 pt-1"></div>
+
+                            <!-- Conteneur Accept / Refuse (Défis normaux) -->
+                            <div id="consent-actions-container" class="grid grid-cols-2 gap-2 pt-2">
+                                <button onclick="acceptChallenge()" class="py-2.5 bg-emerald-950/80 border border-emerald-800/50 hover:bg-emerald-900 text-emerald-200 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-check"></i> Accepter
+                                </button>
+                                <button onclick="refuseChallenge()" class="py-2.5 bg-rose-950/80 border border-rose-900/50 hover:bg-rose-900 text-rose-200 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-xmark"></i> Refuser (Défaite)
+                                </button>
+                            </div>
+
+                            <!-- Conteneur Bouton Valider Quiz (pour les défis Quiz) -->
+                            <div id="quiz-action-container" class="hidden pt-2">
+                                <button onclick="submitQuizAnswer()" class="w-full py-3 bg-gradient-to-r from-sky-700 to-sky-900 hover:from-sky-600 hover:to-sky-800 text-white font-semibold text-xs rounded-xl shadow-lg shadow-sky-950/50 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-check-double"></i> Valider ma réponse
+                                </button>
+                            </div>
+
+                            <!-- Conteneur Bouton Voir en grand (Questions / Réponse libre) -->
+                            <div id="fullscreen-action-container" class="hidden pt-2">
+                                <button onclick="openAnswerFullscreen()" class="w-full py-3 bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-semibold text-xs rounded-xl shadow-lg shadow-purple-950/50 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-expand"></i> Voir ma réponse en grand
+                                </button>
+                            </div>
 
                             <div id="card-media-preview" class="hidden rounded-xl overflow-hidden border border-white/5 bg-noir-900 relative"></div>
                         </div>
 
-                        <div class="space-y-2.5 pt-4 border-t border-white/5">
-                            <div id="timer-action-container" class="hidden">
-                                <button id="btn-start-timer" onclick="startTimer()" class="w-full py-2.5 bg-emerald-950/60 border border-emerald-800/40 hover:bg-emerald-900/60 text-emerald-200 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-play"></i> Démarrer le chronomètre
-                                </button>
-                            </div>
-
+                        <div class="space-y-2 pt-3 border-t border-white/5">
                             <div class="grid grid-cols-3 gap-2">
-                                <button onclick="openMediaCapture('photo')" class="py-2.5 px-2 bg-noir-900 hover:bg-noir-700 border border-white/5 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
+                                <button onclick="openMediaCapture('photo')" class="py-2 px-2 bg-noir-900 hover:bg-noir-700 border border-white/5 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
                                     <i class="fa-solid fa-camera text-rose-400 text-xs"></i> Photo
                                 </button>
-                                <button onclick="openMediaCapture('video')" class="py-2.5 px-2 bg-noir-900 hover:bg-noir-700 border border-white/5 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
+                                <button onclick="openMediaCapture('video')" class="py-2 px-2 bg-noir-900 hover:bg-noir-700 border border-white/5 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
                                     <i class="fa-solid fa-video text-rose-400 text-xs"></i> Vidéo
                                 </button>
-                                <button onclick="openInGameGalleryPicker()" class="py-2.5 px-2 bg-noir-900 hover:bg-noir-700 border border-white/5 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
+                                <button onclick="openInGameGalleryPicker()" class="py-2 px-2 bg-noir-900 hover:bg-noir-700 border border-white/5 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
                                     <i class="fa-solid fa-photo-film text-amber-400 text-xs"></i> Galerie
                                 </button>
                             </div>
 
-                            <button onclick="nextTurn()" class="w-full py-3 bg-rose-700 hover:bg-rose-600 text-white font-medium rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition">
+                            <button onclick="nextTurn()" class="w-full py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-medium rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition">
                                 <span>Défi suivant</span> <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </div>
@@ -299,9 +477,58 @@
                 </div>
             </div>
 
-            <button onclick="showScreen('screen-home')" class="w-full py-2 text-xs text-slate-500 hover:text-slate-300 transition text-center">
+            <button onclick="quitGame()" class="w-full py-2 text-xs text-slate-500 hover:text-slate-300 transition text-center">
                 Quitter la session
             </button>
+        </section>
+
+        <!-- SCREEN: ÉCRAN DE DÉFAITE / ROULETTE & GAGE SUR-MESURE -->
+        <section id="screen-defeat" class="hidden space-y-5 text-center py-4">
+            <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-950/80 border border-rose-600 flex items-center justify-center text-rose-300 text-2xl shadow-2xl shadow-rose-950/80 animate-pulse">
+                <i class="fa-solid fa-skull"></i>
+            </div>
+            <div class="space-y-1">
+                <h2 class="font-serif text-2xl font-normal text-rose-100">C'est perdu !</h2>
+                <p id="defeat-subtitle" class="text-xs text-slate-300 max-w-xs mx-auto">Tu as échoué à ce défi ou donné la mauvaise réponse.</p>
+            </div>
+
+            <!-- Conteneur Résultat du Gage (Roulette ou Sur-mesure) -->
+            <div id="roulette-result-box" class="hidden p-3.5 bg-noir-800 border border-amber-500/40 rounded-2xl space-y-1.5 text-center shadow-xl">
+                <span id="roulette-result-title" class="text-[10px] tracking-widest uppercase text-amber-300 font-bold block"><i class="fa-solid fa-dice"></i> Gage appliqué</span>
+                <p id="roulette-text" class="text-xs text-amber-100 font-medium italic"></p>
+            </div>
+
+            <!-- Choix des options en cas de défaite -->
+            <div id="defeat-actions-container" class="space-y-3 pt-1">
+                <!-- Option 1 : Bouton Roulette Classique -->
+                <button onclick="spinRoulette()" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700 text-noir-900 font-bold rounded-xl shadow-lg shadow-amber-950/40 text-xs tracking-wider uppercase transition active:scale-98 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-dharmachakra"></i> <span>Lancer la roulette du gage</span>
+                </button>
+
+                <div class="flex items-center gap-3 text-slate-500 text-[11px] my-1">
+                    <div class="flex-1 h-px bg-white/10"></div>
+                    <span>OU</span>
+                    <div class="flex-1 h-px bg-white/10"></div>
+                </div>
+
+                <!-- Option 2 : Taper un gage à la volée -->
+                <div class="bg-noir-800/90 border border-white/5 p-3.5 rounded-2xl space-y-2 text-left">
+                    <label class="text-[11px] font-semibold text-rose-300 block flex items-center gap-1.5">
+                        <i class="fa-solid fa-pen-nib"></i> Inventer un gage à la volée :
+                    </label>
+                    <textarea id="custom-defeat-gage-input" rows="2" placeholder="Ex: Tu dois porter un bandeau pour les 2 prochains tours..." class="w-full bg-noir-900 border border-white/10 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-600 resize-none"></textarea>
+                    <button onclick="applyCustomDefeatGage()" class="w-full py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-medium rounded-xl text-xs uppercase tracking-wider transition shadow-md">
+                        Appliquer ce gage sur-le-mesure
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bouton pour continuer après application du gage -->
+            <div id="defeat-continue-container" class="hidden pt-2">
+                <button onclick="resumeAfterDefeat()" class="w-full py-3 bg-rose-700 hover:bg-rose-600 text-white font-medium rounded-xl text-xs uppercase tracking-wider transition shadow-lg">
+                    Continuer la partie
+                </button>
+            </div>
         </section>
 
         <!-- SCREEN 5: FIN DE PARTIE -->
@@ -328,14 +555,14 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="font-serif text-lg font-medium text-rose-50">Atelier des Défis</h2>
-                    <p class="text-xs text-slate-400">Création, modification et sauvegarde globale</p>
+                    <p class="text-xs text-slate-400">Création, modification et réorganisation</p>
                 </div>
                 <button onclick="showScreen('screen-home')" class="w-8 h-8 rounded-xl bg-noir-800 border border-white/5 text-slate-400 hover:text-white flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
             </div>
 
-            <!-- Onglets de sélection (Défi duo / Défi solo / Carte Joker) -->
+            <!-- Onglets de sélection -->
             <div class="grid grid-cols-3 gap-1.5 bg-noir-800/80 p-1.5 rounded-2xl border border-white/5 text-[11px]">
                 <button type="button" onclick="switchBuilderTab('duo')" id="tab-duo" class="py-2 font-medium rounded-xl bg-rose-950/60 text-rose-200 border border-rose-900/40 transition">
                     👥 Duo
@@ -348,12 +575,44 @@
                 </button>
             </div>
 
-            <!-- Formulaire de création/édition Défi Duo -->
+            <!-- Formulaire Défi Duo -->
             <form id="form-create-duo" onsubmit="saveCustomChallenge(event, 'duo')" class="bg-noir-800/90 border border-white/5 p-4 rounded-3xl space-y-3">
                 <div>
                     <label class="text-[11px] font-medium text-slate-400 mb-1 block">Intitulé du défi Duo</label>
-                    <textarea id="duo-text-input" required rows="2" placeholder="Ex: {giver} embrasse délicatement {target}..." class="w-full bg-noir-900 border border-white/5 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-rose-600 transition resize-none"></textarea>
-                    <span class="text-[10px] text-slate-500 block mt-1">Variables : <code>{giver}</code> (joueur actif), <code>{target}</code> (partenaire).</span>
+                    <textarea id="duo-text-input" required rows="2" placeholder="Ex: {giver} pose une question à {target}..." class="w-full bg-noir-900 border border-white/5 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-rose-600 transition resize-none"></textarea>
+                    <span class="text-[10px] text-slate-500 block mt-1">Variables : <code>{giver}</code>, <code>{target}</code>.</span>
+                </div>
+
+                <!-- Type d'interaction supplémentaire (Questionnaire / Quiz / Réponse Libre) -->
+                <div class="bg-noir-900/60 p-3 rounded-2xl border border-white/5 space-y-2">
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <label class="flex items-center gap-1.5 cursor-pointer text-[10px] text-sky-300">
+                            <input type="checkbox" id="duo-is-questionnaire" onchange="toggleInteractionType('duo', 'questionnaire')" class="w-3.5 h-3.5 rounded border-white/20 bg-noir-800 text-rose-600 focus:ring-0">
+                            <span>QCM simple</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-[10px] text-emerald-300">
+                            <input type="checkbox" id="duo-is-quiz" onchange="toggleInteractionType('duo', 'quiz')" class="w-3.5 h-3.5 rounded border-white/20 bg-noir-800 text-rose-600 focus:ring-0">
+                            <span>Quiz (Gage si erreur)</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-[10px] text-purple-300">
+                            <input type="checkbox" id="duo-is-freeform" onchange="toggleInteractionType('duo', 'freeform')" class="w-3.5 h-3.5 rounded border-white/20 bg-noir-800 text-rose-600 focus:ring-0">
+                            <span>Libre</span>
+                        </label>
+                    </div>
+
+                    <div id="duo-options-container" class="hidden space-y-1.5 pt-1">
+                        <label id="duo-options-label" class="text-[10px] text-slate-400 block">Options de choix (une par ligne) :</label>
+                        <textarea id="duo-options-input" rows="3" placeholder="Option 1&#10;Option 2" class="w-full bg-noir-800 border border-white/5 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none resize-none"></textarea>
+                        
+                        <div id="duo-correct-answer-box" class="hidden pt-1">
+                            <label class="text-[10px] text-emerald-300 font-semibold block mb-1">Quelle est la BONNE réponse parmi ces options ?</label>
+                            <input type="text" id="duo-correct-answer-input" placeholder="Écrire la bonne réponse exacte" class="w-full bg-noir-800 border border-emerald-500/40 rounded-xl p-2 text-xs text-emerald-200 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div id="duo-freeform-container" class="hidden pt-1">
+                        <p class="text-[10px] text-slate-400">Le joueur disposera d'un champ de saisie libre pour écrire sa réponse ou son secret.</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2">
@@ -366,8 +625,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Durée (min)</label>
-                        <input type="number" id="duo-duration-minutes" min="0" max="60" value="0" placeholder="0 = Infini" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none focus:border-rose-600">
+                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Durée (sec)</label>
+                        <input type="number" id="duo-duration-seconds" min="0" max="3600" value="0" placeholder="0 = Infini" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none focus:border-rose-600">
                     </div>
                     <div>
                         <label class="text-[10px] font-medium text-slate-400 mb-1 block">Niveau</label>
@@ -394,12 +653,44 @@
                 </div>
             </form>
 
-            <!-- Formulaire de création/édition Défi Solo (Caché par défaut) -->
+            <!-- Formulaire Défi Solo -->
             <form id="form-create-solo" onsubmit="saveCustomChallenge(event, 'solo')" class="hidden bg-noir-800/90 border border-white/5 p-4 rounded-3xl space-y-3">
                 <div>
                     <label class="text-[11px] font-medium text-rose-300 mb-1 block">Intitulé du défi Solo</label>
-                    <textarea id="solo-text-input" required rows="2" placeholder="Ex: {player} s'accorde 10 minutes d'exploration..." class="w-full bg-noir-900 border border-rose-500/30 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition resize-none"></textarea>
-                    <span class="text-[10px] text-slate-500 block mt-1">Variable : <code>{player}</code> (le joueur en solo).</span>
+                    <textarea id="solo-text-input" required rows="2" placeholder="Ex: {player} teste ses connaissances..." class="w-full bg-noir-900 border border-rose-500/30 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition resize-none"></textarea>
+                    <span class="text-[10px] text-slate-500 block mt-1">Variable : <code>{player}</code>.</span>
+                </div>
+
+                <!-- Type d'interaction Solo -->
+                <div class="bg-noir-900/60 p-3 rounded-2xl border border-white/5 space-y-2">
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <label class="flex items-center gap-1.5 cursor-pointer text-[10px] text-sky-300">
+                            <input type="checkbox" id="solo-is-questionnaire" onchange="toggleInteractionType('solo', 'questionnaire')" class="w-3.5 h-3.5 rounded border-white/20 bg-noir-800 text-rose-600 focus:ring-0">
+                            <span>QCM simple</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-[10px] text-emerald-300">
+                            <input type="checkbox" id="solo-is-quiz" onchange="toggleInteractionType('solo', 'quiz')" class="w-3.5 h-3.5 rounded border-white/20 bg-noir-800 text-rose-600 focus:ring-0">
+                            <span>Quiz (Gage si erreur)</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-[10px] text-purple-300">
+                            <input type="checkbox" id="solo-is-freeform" onchange="toggleInteractionType('solo', 'freeform')" class="w-3.5 h-3.5 rounded border-white/20 bg-noir-800 text-rose-600 focus:ring-0">
+                            <span>Libre</span>
+                        </label>
+                    </div>
+
+                    <div id="solo-options-container" class="hidden space-y-1.5 pt-1">
+                        <label id="solo-options-label" class="text-[10px] text-slate-400 block">Options de choix (une par ligne) :</label>
+                        <textarea id="solo-options-input" rows="3" placeholder="Option 1&#10;Option 2" class="w-full bg-noir-800 border border-white/5 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none resize-none"></textarea>
+                        
+                        <div id="solo-correct-answer-box" class="hidden pt-1">
+                            <label class="text-[10px] text-emerald-300 font-semibold block mb-1">Quelle est la BONNE réponse parmi ces options ?</label>
+                            <input type="text" id="solo-correct-answer-input" placeholder="Écrire la bonne réponse exacte" class="w-full bg-noir-800 border border-emerald-500/40 rounded-xl p-2 text-xs text-emerald-200 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div id="solo-freeform-container" class="hidden pt-1">
+                        <p class="text-[10px] text-slate-400">Le joueur disposera d'un champ de saisie libre pour écrire sa réponse.</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2">
@@ -412,8 +703,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Durée (min)</label>
-                        <input type="number" id="solo-duration-minutes" min="0" max="60" value="0" placeholder="0 = Infini" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none focus:border-rose-600">
+                        <label class="text-[10px] font-medium text-slate-400 mb-1 block">Durée (sec)</label>
+                        <input type="number" id="solo-duration-seconds" min="0" max="3600" value="0" placeholder="0 = Infini" class="w-full bg-noir-900 border border-white/5 rounded-xl p-2 text-xs text-slate-300 focus:outline-none focus:border-rose-600">
                     </div>
                     <div>
                         <label class="text-[10px] font-medium text-slate-400 mb-1 block">Niveau</label>
@@ -440,17 +731,28 @@
                 </div>
             </form>
 
-            <!-- Formulaire de création/édition Carte Joker (Caché par défaut) -->
+            <!-- Formulaire Carte Joker / Gage Roulette -->
             <form id="form-create-joker" onsubmit="saveCustomJoker(event)" class="hidden bg-noir-800/90 border border-white/5 p-4 rounded-3xl space-y-3">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] font-medium text-amber-300 mb-1 block">Type d'élément</label>
+                        <select id="joker-mode-select" class="w-full bg-noir-900 border border-amber-500/30 rounded-xl p-2 text-xs text-slate-200 focus:outline-none">
+                            <option value="duo">Carte Joker (Mode Duo)</option>
+                            <option value="solo">Carte Joker (Mode Solo)</option>
+                            <option value="substitute">Gage de substitution (Roulette)</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div>
-                    <label class="text-[11px] font-medium text-amber-300 mb-1 block">Effet ou texte de la Carte Joker personnalisée</label>
-                    <textarea id="joker-text-input" required rows="3" placeholder="Ex: {giver} gagne le droit d'échanger ce défi ou d'imposer un gage de son choix à {target}..." class="w-full bg-noir-900 border border-amber-500/30 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500 transition resize-none">✨ {giver} active sa Carte Joker : immunité totale pour ce tour ou échange de gage avec {target} !</textarea>
-                    <span class="text-[10px] text-slate-500 block mt-1">Variables : <code>{giver}</code>, <code>{target}</code>.</span>
+                    <label class="text-[11px] font-medium text-amber-300 mb-1 block">Texte de l'élément</label>
+                    <textarea id="joker-text-input" required rows="3" placeholder="Ex: {player} active son Joker solo..." class="w-full bg-noir-900 border border-amber-500/30 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500 transition resize-none"></textarea>
+                    <span class="text-[10px] text-slate-500 block mt-1">Variables (pour les jokers) : <code>{giver}</code>, <code>{target}</code> ou <code>{player}</code>.</span>
                 </div>
 
                 <div class="flex gap-2">
                     <button type="submit" class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-500 text-noir-900 font-bold text-xs rounded-xl transition shadow-lg shadow-amber-950/40">
-                        Créer la Carte Joker
+                        Créer l'élément
                     </button>
                     <button type="button" id="btn-cancel-edit-joker" onclick="cancelEdit('joker')" class="hidden py-2.5 px-3 bg-noir-900 border border-white/10 text-slate-400 text-xs rounded-xl transition">
                         Annuler
@@ -458,16 +760,15 @@
                 </div>
             </form>
 
-            <!-- Liste et boutons Sauvegarde Globale (Défis + Galerie) -->
+            <!-- Liste et réorganisation -->
             <div class="space-y-2">
                 <div class="flex justify-between items-center px-1">
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Séquence & Défis (<span id="challenges-count">0</span>)</span>
                     <button onclick="clearAllChallenges()" class="text-[11px] text-rose-400/80 hover:text-rose-300">Réinitialiser</button>
                 </div>
 
-                <div id="challenges-list" class="space-y-2 max-h-[150px] overflow-y-auto pr-1"></div>
+                <div id="challenges-list" class="space-y-2 max-h-[160px] overflow-y-auto pr-1"></div>
 
-                <!-- Boutons Sauvegarde Totale (Défis + Photos/Vidéos) -->
                 <div class="flex gap-2 pt-2 border-t border-white/5">
                     <button type="button" onclick="exportFullBackup()" class="flex-1 py-2.5 bg-rose-950/40 border border-rose-900/60 hover:bg-rose-900/40 text-[11px] text-rose-200 rounded-xl transition flex items-center justify-center gap-1.5 font-medium">
                         <i class="fa-solid fa-file-arrow-down"></i> Sauvegarder Tout (Zip/JSON)
@@ -492,11 +793,28 @@
                 </button>
             </div>
 
-            <!-- Grille de miniatures (3 colonnes) -->
             <div id="gallery-grid" class="grid grid-cols-3 gap-2.5 max-h-[420px] overflow-y-auto pr-1"></div>
         </section>
 
     </main>
+
+    <!-- FULLSCREEN ANSWER MODAL (VOIR LA RÉPONSE EN GRAND) -->
+    <div id="fullscreen-answer-modal" class="fixed inset-0 bg-noir-900/98 z-50 hidden flex flex-col justify-between p-6 backdrop-blur-2xl">
+        <div class="flex justify-between items-center text-slate-200">
+            <span class="font-serif text-sm tracking-wider uppercase text-purple-300"><i class="fa-solid fa-expand"></i> Réponse Plein Écran</span>
+            <button onclick="closeAnswerFullscreen()" class="w-9 h-9 rounded-xl bg-noir-800 border border-white/10 text-slate-300 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+        <div class="flex-1 my-6 flex items-center justify-center text-center px-4">
+            <p id="fullscreen-answer-text" class="font-serif text-2xl md:text-3xl text-purple-100 font-medium leading-relaxed italic"></p>
+        </div>
+        <div class="text-center">
+            <button onclick="closeAnswerFullscreen()" class="py-3 px-8 bg-purple-700 hover:bg-purple-600 text-white font-medium rounded-xl text-xs tracking-wider uppercase transition shadow-xl shadow-purple-950/50">
+                Fermer et passer au défi suivant
+            </button>
+        </div>
+    </div>
 
     <!-- MEDIA PREVIEW LIGHTBOX MODAL -->
     <div id="lightbox-modal" class="fixed inset-0 bg-noir-900/95 z-50 hidden flex flex-col justify-between p-5 backdrop-blur-xl">
@@ -564,6 +882,40 @@
         const DB_VERSION = 1;
         let db = null;
         let activeLightboxMediaId = null;
+        let lastAnswerMemory = null;
+        let currentEffectiveDuration = 0;
+
+        // Gestion Anti-veille (Wake Lock API)
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                } catch (err) {
+                    // Ignorer si refusé ou non supporté
+                }
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release().then(() => {
+                    wakeLock = null;
+                });
+            }
+        }
+
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        });
+
+        // Gestion Audio Juke-box (Web Audio API)
+        let audioCtx = null;
+        let activeAudioSource = null;
+        let currentActiveSound = null;
 
         function initDB() {
             return new Promise((resolve) => {
@@ -575,22 +927,77 @@
                 request.onsuccess = (e) => {
                     db = e.target.result;
                     loadMediaCount();
+                    renderKamasutraBank();
                     resolve(db);
                 };
             });
         }
 
+        const kamasutraPositions = [
+            { name: "Le Missionnaire Classique", category: "Classique", level: 1, desc: "{giver} et {target} partagent un face-à-face intime, idéal pour le regard et la tendresse." },
+            { name: "La Cuillère", category: "Douceur", level: 1, desc: "Allongés sur le côté, {giver} enlace {target} par l'arrière pour une relaxation totale." },
+            { name: "Le Lotus", category: "Assise", level: 2, desc: "{target} s'assoit face à {giver}, jambes enroulées, favorisant la fusion et la lenteur." },
+            { name: "L'Amazone", category: "Dominante", level: 2, desc: "{target} prend le contrôle en s'installant au-dessus de {giver} pour rythmer l'intensité." },
+            { name: "Le Pont Suspendu", category: "Intense", level: 3, desc: "Une position arquée et audacieuse offrant un angle d'exploration profond et torride." },
+            { name: "L'Andromaque", category: "Dominante", level: 2, desc: "Face à face inversé, {target} domine en position assise pour un contact visuel et tactile total." }
+        ];
+
         const defaultChallenges = [
-            // Défis Duo
             { id: 'def-1', type: 'duo', text: "{giver} chuchote un secret inavouable à l'oreille de {target}.", duration: 0, level: 1, targetGender: 'all', isJoker: false },
             { id: 'def-2', type: 'duo', text: "{giver} offre un massage relaxant des épaules à {target}.", duration: 120, level: 1, targetGender: 'all', isJoker: false },
             { id: 'def-3', type: 'duo', text: "{giver} retire un vêtement de {target} en utilisant uniquement les mains.", duration: 60, level: 2, targetGender: 'all', isJoker: false },
             { id: 'def-4', type: 'duo', text: "{giver} embrasse {target} passionnément sans s'arrêter.", duration: 60, level: 2, targetGender: 'all', isJoker: false },
             { id: 'def-5', type: 'duo', text: "{giver} explore le corps de {target} des lèvres des pieds jusqu'au cou.", duration: 180, level: 3, targetGender: 'all', isJoker: false },
-            { id: 'joker-def', type: 'duo', text: "✨ {giver} active sa Carte Joker magique ! Immunité totale ou droit d'imposer un gage libre à {target}.", duration: 0, level: 1, targetGender: 'all', isJoker: true },
-            
-            // Défis Solo par défaut
+            { 
+                id: 'def-quiz-1', 
+                type: 'duo', 
+                isQuiz: true,
+                text: "{target}, devine ce que {giver} préfère par-dessus tout pour commencer :", 
+                options: [
+                    "Des baisers dans le cou",
+                    "Des caresses lentes",
+                    "Un massage vigoureux",
+                    "Des compliments chuchotés"
+                ],
+                correctAnswer: "Des baisers dans le cou",
+                duration: 0, 
+                level: 2, 
+                targetGender: 'all', 
+                isJoker: false 
+            },
+            { 
+                id: 'def-q1', 
+                type: 'duo', 
+                isQuestionnaire: true,
+                text: "{target} choisit parmi ces options ce que {giver} doit réaliser immédiatement :", 
+                options: [
+                    "Un baiser langoureux de 30 secondes",
+                    "Des caresses douces dans le cou",
+                    "Un massage des mains et des poignets",
+                    "Un compliment chuchoté très intime"
+                ],
+                duration: 0, 
+                level: 1, 
+                targetGender: 'all', 
+                isJoker: false 
+            },
             { id: 'solo-1', type: 'solo', text: "{player} s'accorde 5 minutes de respiration profonde et d'auto-observation face au miroir.", duration: 300, level: 1, targetGender: 'all', isJoker: false },
+            { 
+                id: 'solo-q1', 
+                type: 'solo', 
+                isQuestionnaire: true,
+                text: "{player}, sélectionne tes intentions pour cette session :", 
+                options: [
+                    "Prendre mon temps et lâcher prise",
+                    "Explorer de nouvelles sensations",
+                    "M'accorder un moment 100% égoïste",
+                    "Profiter du calme et de l'apaisement"
+                ],
+                duration: 300, 
+                level: 1, 
+                targetGender: 'all', 
+                isJoker: false 
+            },
             { id: 'solo-2', type: 'solo', text: "{player} se prépare un moment de détente sensorielle exclusif (bain, musique douce).", duration: 600, level: 1, targetGender: 'all', isJoker: false },
             { id: 'solo-3', type: 'solo', text: "{player} s'explore avec attention et prend conscience de ses zones de plaisir intimes.", duration: 300, level: 2, targetGender: 'all', isJoker: false },
             { id: 'solo-4', type: 'solo', text: "{player} se consacre une séance intime torride sans retenue.", duration: 600, level: 3, targetGender: 'all', isJoker: false }
@@ -600,11 +1007,12 @@
             gameMode: 'duo',
             p1: 'Partenaire 1', p1Gender: 'male', p1Jokers: 1,
             p2: 'Partenaire 2', p2Gender: 'female', p2Jokers: 1,
-            soloName: 'Mon Profil', soloGender: 'female',
-            globalDurationMinutes: 2,
+            soloName: 'Mon Profil', soloGender: 'female', soloJokers: 1,
+            globalDurationSeconds: 120,
             progressionMode: 'fixed',
             singleLevel: 1,
             orderMode: 'sequential',
+            underwearRule: true,
             challenges: [],
             currentIndex: 0,
             activePlayer: 1,
@@ -627,6 +1035,132 @@
             updateGlobalDurationDisplay();
         });
 
+        function toggleAmbientSound(type) {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (currentActiveSound === type) {
+                stopAllAmbientSounds();
+                return;
+            }
+
+            stopAllAmbientSounds();
+            currentActiveSound = type;
+            document.getElementById('jukebox-badge').classList.remove('hidden');
+
+            const bufferSize = 2 * audioCtx.sampleRate;
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                if (type === 'fire') {
+                    output[i] = (Math.random() > 0.995 ? (Math.random() * 2 - 1) * 0.8 : (Math.random() * 2 - 1) * 0.05);
+                } else if (type === 'rain') {
+                    output[i] = (Math.random() * 2 - 1) * 0.15;
+                } else {
+                    output[i] = (Math.random() * 2 - 1) * 0.08;
+                }
+            }
+
+            const whiteNoise = audioCtx.createBufferSource();
+            whiteNoise.buffer = noiseBuffer;
+            whiteNoise.loop = true;
+
+            const filter = audioCtx.createBiquadFilter();
+            if (type === 'fire') {
+                filter.type = 'lowpass';
+                filter.frequency.value = 800;
+            } else if (type === 'rain') {
+                filter.type = 'bandpass';
+                filter.frequency.value = 1200;
+            } else {
+                filter.type = 'lowpass';
+                filter.frequency.value = 300;
+            }
+
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.value = 0.2;
+
+            whiteNoise.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            whiteNoise.start();
+            activeAudioSource = whiteNoise;
+
+            ['fire', 'rain', 'cosmic'].forEach(t => {
+                const btn = document.getElementById('btn-sound-' + t);
+                if (t === type) {
+                    btn.innerText = "En cours...";
+                    btn.className = "py-2 px-4 rounded-xl bg-rose-950/60 border border-rose-600 text-xs font-medium text-rose-200 transition";
+                } else {
+                    btn.innerText = "Activer";
+                    btn.className = "py-2 px-4 rounded-xl bg-noir-900 border border-white/10 text-xs font-medium text-slate-300 hover:border-rose-500 transition";
+                }
+            });
+        }
+
+        function stopAllAmbientSounds() {
+            if (activeAudioSource) {
+                try { activeAudioSource.stop(); } catch(e) {}
+                activeAudioSource = null;
+            }
+            currentActiveSound = null;
+            document.getElementById('jukebox-badge').classList.add('hidden');
+
+            ['fire', 'rain', 'cosmic'].forEach(t => {
+                const btn = document.getElementById('btn-sound-' + t);
+                if (btn) {
+                    btn.innerText = "Activer";
+                    btn.className = "py-2 px-4 rounded-xl bg-noir-900 border border-white/10 text-xs font-medium text-slate-300 hover:border-rose-500 transition";
+                }
+            });
+        }
+
+        function renderKamasutraBank() {
+            const container = document.getElementById('kamasutra-list');
+            container.innerHTML = '';
+
+            kamasutraPositions.forEach((pos, idx) => {
+                const el = document.createElement('div');
+                el.className = 'p-3.5 bg-noir-800/90 border border-white/5 rounded-2xl space-y-2';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-serif font-semibold text-rose-200">${pos.name}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-rose-950/60 text-rose-300 border border-rose-900/40">${pos.category}</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">${pos.desc}</p>
+                    <div class="flex justify-end pt-1">
+                        <button onclick="useKamasutraAsChallenge(${idx})" class="py-1.5 px-3 bg-rose-700 hover:bg-rose-600 text-white text-[11px] font-medium rounded-xl transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus text-[10px]"></i> Ajouter aux défis
+                        </button>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function useKamasutraAsChallenge(index) {
+            const pos = kamasutraPositions[index];
+            const newChallenge = {
+                id: 'kama-' + Date.now(),
+                type: 'duo',
+                text: `{giver} et {target} essaient la position "${pos.name}" : ${pos.desc}`,
+                duration: 180,
+                level: pos.level,
+                targetGender: 'all',
+                isJoker: false,
+                mediaId: null
+            };
+            state.challenges.push(newChallenge);
+            saveChallengesToStorage();
+            alert(`La position "${pos.name}" a été ajoutée à vos défis duo !`);
+        }
+
         function setGameMode(mode) {
             state.gameMode = mode;
             document.getElementById('btn-mode-duo').className = mode === 'duo' 
@@ -640,27 +1174,30 @@
             document.getElementById('setup-solo-container').classList.toggle('hidden', mode !== 'solo');
         }
 
-        function adjustSetupJokers(playerNum, delta) {
-            if (playerNum === 1) {
+        function adjustSetupJokers(target, delta) {
+            if (target === 1) {
                 state.p1Jokers = Math.max(0, Math.min(10, state.p1Jokers + delta));
                 document.getElementById('setup-p1-jokers').innerText = state.p1Jokers;
-            } else {
+            } else if (target === 2) {
                 state.p2Jokers = Math.max(0, Math.min(10, state.p2Jokers + delta));
                 document.getElementById('setup-p2-jokers').innerText = state.p2Jokers;
+            } else if (target === 'solo') {
+                state.soloJokers = Math.max(0, Math.min(10, state.soloJokers + delta));
+                document.getElementById('setup-solo-jokers').innerText = state.soloJokers;
             }
         }
 
         function adjustGlobalDuration(delta) {
-            state.globalDurationMinutes = Math.max(0, Math.min(60, state.globalDurationMinutes + delta));
+            state.globalDurationSeconds = Math.max(0, Math.min(3600, state.globalDurationSeconds + delta));
             updateGlobalDurationDisplay();
         }
 
         function updateGlobalDurationDisplay() {
             const display = document.getElementById('global-duration-display');
-            if (state.globalDurationMinutes === 0) {
+            if (state.globalDurationSeconds === 0) {
                 display.innerText = 'Désactivé';
             } else {
-                display.innerText = `${state.globalDurationMinutes} min`;
+                display.innerText = `${state.globalDurationSeconds} s`;
             }
         }
 
@@ -676,12 +1213,18 @@
         }
 
         function showScreen(screenId) {
-            ['screen-home', 'screen-game', 'screen-game-over', 'screen-builder', 'screen-gallery'].forEach(id => {
+            ['screen-home', 'screen-rules', 'screen-jukebox', 'screen-kamasutra', 'screen-game', 'screen-defeat', 'screen-game-over', 'screen-builder', 'screen-gallery'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
             document.getElementById(screenId).classList.remove('hidden');
             if (screenId === 'screen-builder') renderBuilderList();
             if (screenId === 'screen-gallery') renderGallery();
+            if (screenId === 'screen-kamasutra') renderKamasutraBank();
+        }
+
+        function quitGame() {
+            releaseWakeLock();
+            showScreen('screen-home');
         }
 
         function switchBuilderTab(tab) {
@@ -699,6 +1242,28 @@
             formDuo.classList.toggle('hidden', tab !== 'duo');
             formSolo.classList.toggle('hidden', tab !== 'solo');
             formJok.classList.toggle('hidden', tab !== 'joker');
+        }
+
+        function toggleInteractionType(type, mode) {
+            const isQ = document.getElementById(type + '-is-questionnaire');
+            const isQuiz = document.getElementById(type + '-is-quiz');
+            const isF = document.getElementById(type + '-is-freeform');
+
+            if (mode === 'questionnaire' && isQ.checked) {
+                isQuiz.checked = false;
+                isF.checked = false;
+            } else if (mode === 'quiz' && isQuiz.checked) {
+                isQ.checked = false;
+                isF.checked = false;
+            } else if (mode === 'freeform' && isF.checked) {
+                isQ.checked = false;
+                isQuiz.checked = false;
+            }
+
+            const showOptions = isQ.checked || isQuiz.checked;
+            document.getElementById(type + '-options-container').classList.toggle('hidden', !showOptions);
+            document.getElementById(type + '-correct-answer-box').classList.toggle('hidden', !isQuiz.checked);
+            document.getElementById(type + '-freeform-container').classList.toggle('hidden', !isF.checked);
         }
 
         function setProgressionMode(mode) {
@@ -728,7 +1293,7 @@
             body.style.filter = state.isDimmed ? 'brightness(0.6)' : 'none';
         }
 
-        function startGame() {
+        function prepareGame() {
             if (state.gameMode === 'duo') {
                 state.p1 = document.getElementById('p1-name').value || 'Partenaire 1';
                 state.p1Gender = document.getElementById('p1-gender').value;
@@ -739,24 +1304,35 @@
                 state.soloGender = document.getElementById('solo-gender').value;
             }
 
+            state.underwearRule = document.getElementById('setup-underwear-rule').checked;
+            document.getElementById('rule-underwear-notice').classList.toggle('hidden', !state.underwearRule);
+            document.getElementById('game-underwear-badge').classList.toggle('hidden', !state.underwearRule);
+
             state.singleLevel = parseInt(document.getElementById('single-level-select').value);
             state.currentIndex = 0;
             state.activePlayer = 1;
+            lastAnswerMemory = null;
 
+            showScreen('screen-rules');
+        }
+
+        async function startGameFromRules() {
             showScreen('screen-game');
+            await requestWakeLock();
             loadTurnChallenge();
         }
 
         function getFilteredChallenges() {
             return state.challenges.filter(c => {
                 if (state.gameMode === 'solo') {
+                    if (c.isJoker) return c.jokerMode === 'solo';
                     if (c.type !== 'solo') return false;
                     const matchLevel = state.progressionMode === 'fixed' ? parseInt(c.level) === state.singleLevel : true;
                     const matchGender = c.targetGender === 'all' || c.targetGender === state.soloGender;
                     return matchLevel && matchGender;
                 } else {
+                    if (c.isJoker) return c.jokerMode === 'duo' || !c.jokerMode;
                     if (c.type === 'solo') return false;
-                    if (c.isJoker) return true;
                     const activeGender = state.activePlayer === 1 ? state.p1Gender : state.p2Gender;
                     const matchLevel = state.progressionMode === 'fixed' ? parseInt(c.level) === state.singleLevel : true;
                     const matchGender = c.targetGender === 'all' || c.targetGender === activeGender;
@@ -786,15 +1362,27 @@
 
             currentTurnTempMediaId = null;
 
+            const prevAnswerBox = document.getElementById('pending-previous-answer-box');
+            const prevAnswerText = document.getElementById('pending-previous-answer-text');
+            if (lastAnswerMemory) {
+                prevAnswerBox.classList.remove('hidden');
+                prevAnswerText.innerText = lastAnswerMemory;
+                lastAnswerMemory = null;
+            } else {
+                prevAnswerBox.classList.add('hidden');
+            }
+
             const activeList = getFilteredChallenges();
             
             if (state.orderMode === 'sequential' && state.currentIndex >= activeList.length) {
+                releaseWakeLock();
                 showScreen('screen-game-over');
                 return;
             }
 
             if (activeList.length === 0) {
                 alert("Aucun défi disponible pour ce profil / mode / niveau.");
+                releaseWakeLock();
                 showScreen('screen-home');
                 return;
             }
@@ -802,16 +1390,40 @@
             let challenge = getCurrentActiveChallenge();
             const jokerBtn = document.getElementById('btn-joker');
 
+            const consentActions = document.getElementById('consent-actions-container');
+            const quizAction = document.getElementById('quiz-action-container');
+            const fullscreenAction = document.getElementById('fullscreen-action-container');
+
+            if (challenge.isQuiz) {
+                consentActions.classList.add('hidden');
+                quizAction.classList.remove('hidden');
+                fullscreenAction.classList.add('hidden');
+            } else if (challenge.isQuestionnaire || challenge.isFreeform) {
+                consentActions.classList.add('hidden');
+                quizAction.classList.add('hidden');
+                fullscreenAction.classList.remove('hidden');
+            } else {
+                consentActions.classList.remove('hidden');
+                quizAction.classList.add('hidden');
+                fullscreenAction.classList.add('hidden');
+            }
+
             if (state.gameMode === 'solo') {
                 const playerName = state.soloName;
                 document.getElementById('current-player-badge').innerText = playerName;
-                document.getElementById('game-level-badge').innerText = getLevelName(challenge.level);
+                document.getElementById('game-level-badge').innerText = challenge.isJoker ? "CARTE JOKER SOLO" : getLevelName(challenge.level);
                 document.getElementById('game-progress-count').innerText = `${state.currentIndex + 1}/${activeList.length}`;
-                jokerBtn.classList.add('hidden');
+
+                if (state.soloJokers > 0) {
+                    jokerBtn.classList.remove('hidden');
+                    document.getElementById('joker-count').innerText = state.soloJokers;
+                } else {
+                    jokerBtn.classList.add('hidden');
+                }
 
                 const parsedText = challenge.text.replace(/{player}/g, playerName);
                 document.getElementById('card-text-display').innerText = parsedText;
-                document.getElementById('card-category-tag').innerText = "👤 SESSION SOLO — " + getLevelName(challenge.level);
+                document.getElementById('card-category-tag').innerText = challenge.isQuiz ? "🎯 QUIZ (GAGE SI ERREUR)" : (challenge.isQuestionnaire ? "📋 QUESTIONNAIRE SOLO" : (challenge.isFreeform ? "✍️ RÉPONSE LIBRE" : (challenge.isJoker ? "⚡ JOKER SOLO SPÉCIAL" : "👤 SESSION SOLO — " + getLevelName(challenge.level))));
             } else {
                 const giver = state.activePlayer === 1 ? state.p1 : state.p2;
                 const target = state.activePlayer === 1 ? state.p2 : state.p1;
@@ -830,30 +1442,47 @@
 
                 const parsedText = challenge.text.replace(/{giver}/g, giver).replace(/{target}/g, target);
                 document.getElementById('card-text-display').innerText = parsedText;
-                document.getElementById('card-category-tag').innerText = challenge.isJoker ? "⚡ JOKER SPÉCIAL" : getLevelName(challenge.level);
+                document.getElementById('card-category-tag').innerText = challenge.isQuiz ? "🎯 QUIZ (GAGE SI ERREUR)" : (challenge.isQuestionnaire ? "📋 QUESTIONNAIRE CHOIX" : (challenge.isFreeform ? "✍️ RÉPONSE LIBRE" : (challenge.isJoker ? "⚡ JOKER SPÉCIAL" : getLevelName(challenge.level))));
             }
 
-            let effectiveDurationInSeconds = 0;
-            if (!challenge.isJoker) {
+            const interactiveContainer = document.getElementById('card-interactive-container');
+            interactiveContainer.innerHTML = '';
+            
+            if ((challenge.isQuestionnaire || challenge.isQuiz) && challenge.options) {
+                interactiveContainer.classList.remove('hidden');
+                challenge.options.forEach((opt, idx) => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center gap-2.5 p-2 bg-noir-900/60 border border-white/5 rounded-xl text-xs text-slate-200 cursor-pointer hover:border-rose-500/50 transition';
+                    label.innerHTML = `
+                        <input type="radio" name="qcm-choice" value="${opt}" ${idx === 0 ? 'checked' : ''} class="w-3.5 h-3.5 border-white/20 bg-noir-800 text-rose-600 focus:ring-0">
+                        <span>${opt}</span>
+                    `;
+                    interactiveContainer.appendChild(label);
+                });
+            } else if (challenge.isFreeform) {
+                interactiveContainer.classList.remove('hidden');
+                interactiveContainer.innerHTML = `
+                    <textarea id="freeform-user-input" rows="2" placeholder="Écrivez votre réponse ici..." class="w-full bg-noir-900 border border-white/10 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-600 resize-none"></textarea>
+                `;
+            } else {
+                interactiveContainer.classList.add('hidden');
+            }
+
+            currentEffectiveDuration = 0;
+            if (!challenge.isJoker && !challenge.isQuestionnaire && !challenge.isQuiz && !challenge.isFreeform) {
                 if (challenge.duration > 0) {
-                    effectiveDurationInSeconds = challenge.duration;
-                } else if (state.globalDurationMinutes > 0) {
-                    effectiveDurationInSeconds = state.globalDurationMinutes * 60;
+                    currentEffectiveDuration = challenge.duration;
+                } else if (state.globalDurationSeconds > 0) {
+                    currentEffectiveDuration = state.globalDurationSeconds;
                 }
             }
 
             const timerContainer = document.getElementById('card-timer-container');
-            const timerAction = document.getElementById('timer-action-container');
-            if (effectiveDurationInSeconds > 0) {
+            if (currentEffectiveDuration > 0) {
                 timerContainer.classList.remove('hidden');
-                timerAction.classList.remove('hidden');
-                document.getElementById('timer-display').innerText = formatSeconds(effectiveDurationInSeconds);
-                document.getElementById('btn-start-timer').dataset.duration = effectiveDurationInSeconds;
-                document.getElementById('btn-start-timer').disabled = false;
-                document.getElementById('btn-start-timer').innerHTML = `<i class="fa-solid fa-play"></i> Démarrer le chronomètre (${Math.round(effectiveDurationInSeconds / 60)} min)`;
+                document.getElementById('timer-display').innerText = formatSeconds(currentEffectiveDuration);
             } else {
                 timerContainer.classList.add('hidden');
-                timerAction.classList.add('hidden');
             }
 
             const mediaContainer = document.getElementById('card-media-preview');
@@ -864,14 +1493,147 @@
                 if (media) {
                     mediaContainer.classList.remove('hidden');
                     mediaContainer.innerHTML = media.type.startsWith('video') 
-                        ? `<video src="${media.url}" controls class="w-full h-32 object-cover rounded-xl"></video>`
-                        : `<img src="${media.url}" class="w-full h-32 object-cover rounded-xl">`;
+                        ? `<video src="${media.url}" autoplay muted loop playsinline class="w-full h-28 object-cover rounded-xl"></video>`
+                        : `<img src="${media.url}" class="w-full h-28 object-cover rounded-xl">`;
                 } else {
                     mediaContainer.classList.add('hidden');
                 }
             } else {
                 mediaContainer.classList.add('hidden');
             }
+        }
+
+        function acceptChallenge() {
+            document.getElementById('consent-actions-container').classList.add('hidden');
+
+            if (currentEffectiveDuration > 0) {
+                startTimerAutomatic(currentEffectiveDuration);
+            }
+        }
+
+        function submitQuizAnswer() {
+            const challenge = getCurrentActiveChallenge();
+            const checkedRadio = document.querySelector('input[name="qcm-choice"]:checked');
+            
+            if (!checkedRadio) {
+                alert("Veuillez sélectionner une réponse.");
+                return;
+            }
+
+            const userChoice = checkedRadio.value;
+            document.getElementById('quiz-action-container').classList.add('hidden');
+
+            if (userChoice === challenge.correctAnswer) {
+                lastAnswerMemory = `✅ Bonne réponse : "${userChoice}"`;
+                nextTurn();
+            } else {
+                triggerDefeatScreen("Tu as donné la mauvaise réponse au quiz !");
+            }
+        }
+
+        function startTimerAutomatic(durationSec) {
+            let duration = durationSec;
+            const timerContainer = document.getElementById('card-timer-container');
+            timerContainer.classList.remove('hidden');
+            document.getElementById('timer-display').innerText = formatSeconds(duration);
+
+            activeTimer = setInterval(() => {
+                duration--;
+                document.getElementById('timer-display').innerText = formatSeconds(duration);
+                if (duration <= 0) {
+                    clearInterval(activeTimer);
+                    document.getElementById('timer-display').innerText = "TERMINÉ !";
+                    playEndBeep();
+                }
+            }, 1000);
+        }
+
+        function openAnswerFullscreen() {
+            const challenge = getCurrentActiveChallenge();
+            let responseText = "";
+
+            if (challenge.isQuestionnaire) {
+                const checkedRadio = document.querySelector('input[name="qcm-choice"]:checked');
+                responseText = checkedRadio ? checkedRadio.value : "Aucune option sélectionnée";
+            } else if (challenge.isFreeform) {
+                const inputVal = document.getElementById('freeform-user-input').value.trim();
+                if (!inputVal) {
+                    alert("Veuillez saisir votre réponse avant de voir l'affichage grand écran.");
+                    return;
+                }
+                responseText = inputVal;
+            }
+
+            lastAnswerMemory = `"${responseText}"`;
+            document.getElementById('fullscreen-answer-text').innerText = responseText;
+            document.getElementById('fullscreen-answer-modal').classList.remove('hidden');
+        }
+
+        function closeAnswerFullscreen() {
+            document.getElementById('fullscreen-answer-modal').classList.add('hidden');
+            nextTurn();
+        }
+
+        function refuseChallenge() {
+            triggerDefeatScreen("Tu as refusé le défi !");
+        }
+
+        function triggerDefeatScreen(reasonText) {
+            document.getElementById('defeat-subtitle').innerText = reasonText;
+            document.getElementById('roulette-result-box').classList.add('hidden');
+            document.getElementById('defeat-actions-container').classList.remove('hidden');
+            document.getElementById('defeat-continue-container').classList.add('hidden');
+            document.getElementById('custom-defeat-gage-input').value = '';
+            showScreen('screen-defeat');
+        }
+
+        function spinRoulette() {
+            const defeatActions = document.getElementById('defeat-actions-container');
+            const rouletteBox = document.getElementById('roulette-result-box');
+            const rouletteTitle = document.getElementById('roulette-result-title');
+            const rouletteText = document.getElementById('roulette-text');
+            const continueContainer = document.getElementById('defeat-continue-container');
+
+            defeatActions.classList.add('hidden');
+            rouletteBox.classList.remove('hidden');
+            rouletteTitle.innerHTML = `<i class="fa-solid fa-dice"></i> Gage tiré par la roulette`;
+            rouletteText.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-amber-400"></i> Tirage en cours...`;
+
+            setTimeout(() => {
+                const userGages = state.challenges.filter(c => c.isSubstitution);
+                if (userGages.length > 0) {
+                    const randomGage = userGages[Math.floor(Math.random() * userGages.length)];
+                    rouletteText.innerText = randomGage.text;
+                } else {
+                    rouletteText.innerText = "Aucun gage de substitution configuré dans l'Atelier. Créez-en un dans l'onglet Joker !";
+                }
+                continueContainer.classList.remove('hidden');
+            }, 900);
+        }
+
+        function applyCustomDefeatGage() {
+            const inputVal = document.getElementById('custom-defeat-gage-input').value.trim();
+            if (!inputVal) {
+                alert("Veuillez saisir un gage personnalisé avant de l'appliquer.");
+                return;
+            }
+
+            const defeatActions = document.getElementById('defeat-actions-container');
+            const rouletteBox = document.getElementById('roulette-result-box');
+            const rouletteTitle = document.getElementById('roulette-result-title');
+            const rouletteText = document.getElementById('roulette-text');
+            const continueContainer = document.getElementById('defeat-continue-container');
+
+            defeatActions.classList.add('hidden');
+            rouletteBox.classList.remove('hidden');
+            rouletteTitle.innerHTML = `<i class="fa-solid fa-pen-nib"></i> Gage personnalisé appliqué`;
+            rouletteText.innerText = inputVal;
+            continueContainer.classList.remove('hidden');
+        }
+
+        function resumeAfterDefeat() {
+            showScreen('screen-game');
+            nextTurn();
         }
 
         async function openInGameGalleryPicker() {
@@ -902,8 +1664,8 @@
             const mediaContainer = document.getElementById('card-media-preview');
             mediaContainer.classList.remove('hidden');
             mediaContainer.innerHTML = type.startsWith('video')
-                ? `<video src="${url}" controls class="w-full h-32 object-cover rounded-xl"></video>`
-                : `<img src="${url}" class="w-full h-32 object-cover rounded-xl">`;
+                ? `<video src="${url}" autoplay muted loop playsinline class="w-full h-28 object-cover rounded-xl"></video>`
+                : `<img src="${url}" class="w-full h-28 object-cover rounded-xl">`;
             closeIngameGalleryModal();
         }
 
@@ -916,28 +1678,52 @@
         }
 
         function useJoker() {
-            if (state.gameMode === 'solo') return;
-            if (state.activePlayer === 1) state.p1Jokers--;
-            else state.p2Jokers--;
+            const jokerCards = state.challenges.filter(c => c.isJoker && (state.gameMode === 'solo' ? c.jokerMode === 'solo' : (c.jokerMode === 'duo' || !c.jokerMode)));
+            
+            if (jokerCards.length === 0) {
+                alert("Aucune carte Joker personnalisée n'a été créée dans l'Atelier !");
+                return;
+            }
 
-            const jokerCards = state.challenges.filter(c => c.isJoker);
-            const chosenJoker = jokerCards.length > 0 
-                ? jokerCards[Math.floor(Math.random() * jokerCards.length)]
-                : { text: "✨ {giver} active sa Carte Joker magique ! Gage libre ou immunité.", isJoker: true };
+            if (state.gameMode === 'solo') {
+                state.soloJokers--;
+                const chosenJoker = jokerCards[Math.floor(Math.random() * jokerCards.length)];
+                const playerName = state.soloName;
+                document.getElementById('card-inner').classList.remove('flipped');
+                if (activeTimer) clearInterval(activeTimer);
 
-            const giver = state.activePlayer === 1 ? state.p1 : state.p2;
-            const target = state.activePlayer === 1 ? state.p2 : state.p1;
+                const parsedText = chosenJoker.text.replace(/{player}/g, playerName);
+                document.getElementById('card-text-display').innerText = parsedText;
+                document.getElementById('card-category-tag').innerText = "⚡ JOKER SOLO ACTIVÉ";
+                document.getElementById('card-interactive-container').classList.add('hidden');
+                document.getElementById('consent-actions-container').classList.add('hidden');
+                document.getElementById('quiz-action-container').classList.add('hidden');
+                document.getElementById('fullscreen-action-container').classList.add('hidden');
+                document.getElementById('card-timer-container').classList.add('hidden');
+                document.getElementById('card-media-preview').classList.add('hidden');
+                document.getElementById('btn-joker').classList.add('hidden');
+            } else {
+                if (state.activePlayer === 1) state.p1Jokers--;
+                else state.p2Jokers--;
 
-            document.getElementById('card-inner').classList.remove('flipped');
-            if (activeTimer) clearInterval(activeTimer);
+                const chosenJoker = jokerCards[Math.floor(Math.random() * jokerCards.length)];
+                const giver = state.activePlayer === 1 ? state.p1 : state.p2;
+                const target = state.activePlayer === 1 ? state.p2 : state.p1;
 
-            const parsedText = chosenJoker.text.replace(/{giver}/g, giver).replace(/{target}/g, target);
-            document.getElementById('card-text-display').innerText = parsedText;
-            document.getElementById('card-category-tag').innerText = "⚡ CARTE JOKER ACTIVÉE";
-            document.getElementById('card-timer-container').classList.add('hidden');
-            document.getElementById('timer-action-container').classList.add('hidden');
-            document.getElementById('card-media-preview').classList.add('hidden');
-            document.getElementById('btn-joker').classList.add('hidden');
+                document.getElementById('card-inner').classList.remove('flipped');
+                if (activeTimer) clearInterval(activeTimer);
+
+                const parsedText = chosenJoker.text.replace(/{giver}/g, giver).replace(/{target}/g, target);
+                document.getElementById('card-text-display').innerText = parsedText;
+                document.getElementById('card-category-tag').innerText = "⚡ CARTE JOKER ACTIVÉE";
+                document.getElementById('card-interactive-container').classList.add('hidden');
+                document.getElementById('consent-actions-container').classList.add('hidden');
+                document.getElementById('quiz-action-container').classList.add('hidden');
+                document.getElementById('fullscreen-action-container').classList.add('hidden');
+                document.getElementById('card-timer-container').classList.add('hidden');
+                document.getElementById('card-media-preview').classList.add('hidden');
+                document.getElementById('btn-joker').classList.add('hidden');
+            }
 
             setTimeout(() => {
                 revealCard();
@@ -972,47 +1758,58 @@
             }
         }
 
-        function startTimer() {
-            const btn = document.getElementById('btn-start-timer');
-            let duration = parseInt(btn.dataset.duration);
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Décompte en cours...`;
-
-            activeTimer = setInterval(() => {
-                duration--;
-                document.getElementById('timer-display').innerText = formatSeconds(duration);
-                if (duration <= 0) {
-                    clearInterval(activeTimer);
-                    document.getElementById('timer-display').innerText = "TERMINÉ !";
-                    btn.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> Temps écoulé !`;
-                    playEndBeep();
-                }
-            }, 1000);
-        }
-
         function formatSeconds(sec) {
             const m = Math.floor(sec / 60).toString().padStart(2, '0');
             const s = (sec % 60).toString().padStart(2, '0');
             return `${m}:${s}`;
         }
 
+        function moveChallenge(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= state.challenges.length) return;
+            const item = state.challenges.splice(index, 1)[0];
+            state.challenges.splice(newIndex, 0, item);
+            saveChallengesToStorage();
+        }
+
         function editChallenge(id) {
             const challenge = state.challenges.find(c => c.id === id);
             if (!challenge) return;
 
-            if (challenge.isJoker) {
+            if (challenge.isJoker || challenge.isSubstitution) {
                 switchBuilderTab('joker');
                 document.getElementById('joker-text-input').value = challenge.text;
+                document.getElementById('joker-mode-select').value = challenge.isSubstitution ? 'substitute' : (challenge.jokerMode || 'duo');
                 const form = document.getElementById('form-create-joker');
                 form.dataset.editId = id;
-                form.querySelector('button[type="submit"]').innerText = "Modifier la Carte Joker";
+                form.querySelector('button[type="submit"]').innerText = "Modifier l'élément";
                 document.getElementById('btn-cancel-edit-joker').classList.remove('hidden');
             } else if (challenge.type === 'solo') {
                 switchBuilderTab('solo');
                 document.getElementById('solo-text-input').value = challenge.text;
                 document.getElementById('solo-target-gender').value = challenge.targetGender || 'all';
-                document.getElementById('solo-duration-minutes').value = challenge.duration ? challenge.duration / 60 : 0;
+                document.getElementById('solo-duration-seconds').value = challenge.duration || 0;
                 document.getElementById('solo-level').value = challenge.level || 1;
+                
+                const isQ = !!challenge.isQuestionnaire;
+                const isQuiz = !!challenge.isQuiz;
+                const isF = !!challenge.isFreeform;
+                document.getElementById('solo-is-questionnaire').checked = isQ;
+                document.getElementById('solo-is-quiz').checked = isQuiz;
+                document.getElementById('solo-is-freeform').checked = isF;
+
+                const showOpts = isQ || isQuiz;
+                document.getElementById('solo-options-container').classList.toggle('hidden', !showOpts);
+                document.getElementById('solo-correct-answer-box').classList.toggle('hidden', !isQuiz);
+                document.getElementById('solo-freeform-container').classList.toggle('hidden', !isF);
+
+                if (showOpts && challenge.options) {
+                    document.getElementById('solo-options-input').value = challenge.options.join('\n');
+                }
+                if (isQuiz && challenge.correctAnswer) {
+                    document.getElementById('solo-correct-answer-input').value = challenge.correctAnswer;
+                }
+
                 const form = document.getElementById('form-create-solo');
                 form.dataset.editId = id;
                 form.querySelector('button[type="submit"]').innerText = "Modifier le défi Solo";
@@ -1021,8 +1818,28 @@
                 switchBuilderTab('duo');
                 document.getElementById('duo-text-input').value = challenge.text;
                 document.getElementById('duo-target-gender').value = challenge.targetGender || 'all';
-                document.getElementById('duo-duration-minutes').value = challenge.duration ? challenge.duration / 60 : 0;
+                document.getElementById('duo-duration-seconds').value = challenge.duration || 0;
                 document.getElementById('duo-level').value = challenge.level || 1;
+                
+                const isQ = !!challenge.isQuestionnaire;
+                const isQuiz = !!challenge.isQuiz;
+                const isF = !!challenge.isFreeform;
+                document.getElementById('duo-is-questionnaire').checked = isQ;
+                document.getElementById('duo-is-quiz').checked = isQuiz;
+                document.getElementById('duo-is-freeform').checked = isF;
+
+                const showOpts = isQ || isQuiz;
+                document.getElementById('duo-options-container').classList.toggle('hidden', !showOpts);
+                document.getElementById('duo-correct-answer-box').classList.toggle('hidden', !isQuiz);
+                document.getElementById('duo-freeform-container').classList.toggle('hidden', !isF);
+
+                if (showOpts && challenge.options) {
+                    document.getElementById('duo-options-input').value = challenge.options.join('\n');
+                }
+                if (isQuiz && challenge.correctAnswer) {
+                    document.getElementById('duo-correct-answer-input').value = challenge.correctAnswer;
+                }
+
                 const form = document.getElementById('form-create-duo');
                 form.dataset.editId = id;
                 form.querySelector('button[type="submit"]').innerText = "Modifier le défi Duo";
@@ -1035,19 +1852,25 @@
                 const form = document.getElementById('form-create-duo');
                 delete form.dataset.editId;
                 form.reset();
+                document.getElementById('duo-options-container').classList.add('hidden');
+                document.getElementById('duo-correct-answer-box').classList.add('hidden');
+                document.getElementById('duo-freeform-container').classList.add('hidden');
                 form.querySelector('button[type="submit"]').innerText = "Ajouter le défi Duo";
                 document.getElementById('btn-cancel-edit-duo').classList.add('hidden');
             } else if (type === 'solo') {
                 const form = document.getElementById('form-create-solo');
                 delete form.dataset.editId;
                 form.reset();
+                document.getElementById('solo-options-container').classList.add('hidden');
+                document.getElementById('solo-correct-answer-box').classList.add('hidden');
+                document.getElementById('solo-freeform-container').classList.add('hidden');
                 form.querySelector('button[type="submit"]').innerText = "Ajouter le défi Solo";
                 document.getElementById('btn-cancel-edit-solo').classList.add('hidden');
             } else if (type === 'joker') {
                 const form = document.getElementById('form-create-joker');
                 delete form.dataset.editId;
                 form.reset();
-                form.querySelector('button[type="submit"]').innerText = "Créer la Carte Joker";
+                form.querySelector('button[type="submit"]').innerText = "Créer l'élément";
                 document.getElementById('btn-cancel-edit-joker').classList.add('hidden');
             }
         }
@@ -1059,8 +1882,15 @@
 
             if (type === 'duo') {
                 const text = document.getElementById('duo-text-input').value;
+                const isQuestionnaire = document.getElementById('duo-is-questionnaire').checked;
+                const isQuiz = document.getElementById('duo-is-quiz').checked;
+                const isFreeform = document.getElementById('duo-is-freeform').checked;
+                const rawOptions = document.getElementById('duo-options-input').value;
+                const options = (isQuestionnaire || isQuiz) ? rawOptions.split('\n').map(o => o.trim()).filter(o => o.length > 0) : [];
+                const correctAnswer = isQuiz ? document.getElementById('duo-correct-answer-input').value.trim() : null;
+                
                 const targetGender = document.getElementById('duo-target-gender').value;
-                const durationMinutes = parseInt(document.getElementById('duo-duration-minutes').value) || 0;
+                const durationSeconds = parseInt(document.getElementById('duo-duration-seconds').value) || 0;
                 const level = parseInt(document.getElementById('duo-level').value);
                 const mediaFile = document.getElementById('duo-media-file').files[0];
 
@@ -1075,8 +1905,13 @@
                     const index = state.challenges.findIndex(c => c.id === editId);
                     if (index !== -1) {
                         state.challenges[index].text = text;
+                        state.challenges[index].isQuestionnaire = isQuestionnaire;
+                        state.challenges[index].isQuiz = isQuiz;
+                        state.challenges[index].isFreeform = isFreeform;
+                        state.challenges[index].options = options;
+                        state.challenges[index].correctAnswer = correctAnswer;
                         state.challenges[index].targetGender = targetGender;
-                        state.challenges[index].duration = durationMinutes * 60;
+                        state.challenges[index].duration = durationSeconds;
                         state.challenges[index].level = level;
                         if (mediaId) state.challenges[index].mediaId = mediaId;
                     }
@@ -1088,7 +1923,12 @@
                         id: 'custom-duo-' + Date.now(),
                         type: 'duo',
                         text: text,
-                        duration: durationMinutes * 60,
+                        isQuestionnaire: isQuestionnaire,
+                        isQuiz: isQuiz,
+                        isFreeform: isFreeform,
+                        options: options,
+                        correctAnswer: correctAnswer,
+                        duration: durationSeconds,
                         level: level,
                         targetGender: targetGender,
                         isJoker: false,
@@ -1097,10 +1937,20 @@
                     state.challenges.push(newChallenge);
                 }
                 form.reset();
+                document.getElementById('duo-options-container').classList.add('hidden');
+                document.getElementById('duo-correct-answer-box').classList.add('hidden');
+                document.getElementById('duo-freeform-container').classList.add('hidden');
             } else {
                 const text = document.getElementById('solo-text-input').value;
+                const isQuestionnaire = document.getElementById('solo-is-questionnaire').checked;
+                const isQuiz = document.getElementById('solo-is-quiz').checked;
+                const isFreeform = document.getElementById('solo-is-freeform').checked;
+                const rawOptions = document.getElementById('solo-options-input').value;
+                const options = (isQuestionnaire || isQuiz) ? rawOptions.split('\n').map(o => o.trim()).filter(o => o.length > 0) : [];
+                const correctAnswer = isQuiz ? document.getElementById('solo-correct-answer-input').value.trim() : null;
+
                 const targetGender = document.getElementById('solo-target-gender').value;
-                const durationMinutes = parseInt(document.getElementById('solo-duration-minutes').value) || 0;
+                const durationSeconds = parseInt(document.getElementById('solo-duration-seconds').value) || 0;
                 const level = parseInt(document.getElementById('solo-level').value);
                 const mediaFile = document.getElementById('solo-media-file').files[0];
 
@@ -1115,8 +1965,13 @@
                     const index = state.challenges.findIndex(c => c.id === editId);
                     if (index !== -1) {
                         state.challenges[index].text = text;
+                        state.challenges[index].isQuestionnaire = isQuestionnaire;
+                        state.challenges[index].isQuiz = isQuiz;
+                        state.challenges[index].isFreeform = isFreeform;
+                        state.challenges[index].options = options;
+                        state.challenges[index].correctAnswer = correctAnswer;
                         state.challenges[index].targetGender = targetGender;
-                        state.challenges[index].duration = durationMinutes * 60;
+                        state.challenges[index].duration = durationSeconds;
                         state.challenges[index].level = level;
                         if (mediaId) state.challenges[index].mediaId = mediaId;
                     }
@@ -1128,7 +1983,12 @@
                         id: 'custom-solo-' + Date.now(),
                         type: 'solo',
                         text: text,
-                        duration: durationMinutes * 60,
+                        isQuestionnaire: isQuestionnaire,
+                        isQuiz: isQuiz,
+                        isFreeform: isFreeform,
+                        options: options,
+                        correctAnswer: correctAnswer,
+                        duration: durationSeconds,
                         level: level,
                         targetGender: targetGender,
                         isJoker: false,
@@ -1137,6 +1997,9 @@
                     state.challenges.push(newChallenge);
                 }
                 form.reset();
+                document.getElementById('solo-options-container').classList.add('hidden');
+                document.getElementById('solo-correct-answer-box').classList.add('hidden');
+                document.getElementById('solo-freeform-container').classList.add('hidden');
             }
 
             saveChallengesToStorage();
@@ -1148,32 +2011,40 @@
             const form = event.target;
             const editId = form.dataset.editId;
             const text = document.getElementById('joker-text-input').value;
+            const selectedType = document.getElementById('joker-mode-select').value;
+
+            const isSub = selectedType === 'substitute';
 
             if (editId) {
                 const index = state.challenges.findIndex(c => c.id === editId);
                 if (index !== -1) {
                     state.challenges[index].text = text;
+                    state.challenges[index].isSubstitution = isSub;
+                    state.challenges[index].isJoker = !isSub;
+                    state.challenges[index].jokerMode = isSub ? null : selectedType;
                 }
                 delete form.dataset.editId;
-                form.querySelector('button[type="submit"]').innerText = "Créer la Carte Joker";
+                form.querySelector('button[type="submit"]').innerText = "Créer l'élément";
                 document.getElementById('btn-cancel-edit-joker').classList.add('hidden');
             } else {
-                const newJoker = {
-                    id: 'joker-' + Date.now(),
-                    type: 'duo',
+                const newItem = {
+                    id: (isSub ? 'sub-' : 'joker-') + Date.now(),
+                    type: isSub ? 'duo' : selectedType,
                     text: text,
                     duration: 0,
                     level: 1,
                     targetGender: 'all',
-                    isJoker: true,
+                    isJoker: !isSub,
+                    isSubstitution: isSub,
+                    jokerMode: isSub ? null : selectedType,
                     mediaId: null
                 };
-                state.challenges.push(newJoker);
+                state.challenges.push(newItem);
             }
 
             saveChallengesToStorage();
             form.reset();
-            alert("Carte Joker enregistrée avec succès !");
+            alert("Élément enregistré avec succès !");
         }
 
         function renderBuilderList() {
@@ -1181,16 +2052,28 @@
             document.getElementById('challenges-count').innerText = state.challenges.length;
             container.innerHTML = '';
 
-            state.challenges.forEach((item) => {
+            state.challenges.forEach((item, index) => {
                 let badgeLabel = "👥 Duo";
                 let badgeColor = "bg-rose-950/60 text-rose-300 border-rose-900/40";
 
-                if (item.isJoker) {
-                    badgeLabel = "⚡ Joker";
+                if (item.isSubstitution) {
+                    badgeLabel = "🎲 Gage Roulette";
                     badgeColor = "bg-amber-950/60 text-amber-300 border-amber-900/40";
+                } else if (item.isJoker) {
+                    badgeLabel = item.jokerMode === 'solo' ? "⚡ Joker Solo" : "⚡ Joker Duo";
+                    badgeColor = "bg-amber-950/60 text-amber-300 border-amber-900/40";
+                } else if (item.isQuiz) {
+                    badgeLabel = "🎯 Quiz";
+                    badgeColor = "bg-emerald-950/60 text-emerald-300 border-emerald-300/40";
+                } else if (item.isQuestionnaire) {
+                    badgeLabel = "📋 Questionnaire";
+                    badgeColor = "bg-sky-950/60 text-sky-300 border-sky-300/40";
+                } else if (item.isFreeform) {
+                    badgeLabel = "✍️ Réponse libre";
+                    badgeColor = "bg-purple-950/60 text-purple-300 border-purple-300/40";
                 } else if (item.type === 'solo') {
                     badgeLabel = "👤 Solo";
-                    badgeColor = "bg-purple-950/60 text-purple-300 border-purple-900/40";
+                    badgeColor = "bg-purple-950/60 text-purple-300 border-purple-300/40";
                 }
                 
                 const el = document.createElement('div');
@@ -1198,16 +2081,22 @@
                 el.innerHTML = `
                     <div class="space-y-1 flex-1 pr-2">
                         <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 text-[10px] rounded border ${badgeColor}">${badgeLabel} (${getLevelName(item.level)})</span>
+                            <span class="px-2 py-0.5 text-[10px] rounded border ${badgeColor}">#${index + 1} — ${badgeLabel}</span>
                         </div>
                         <p class="text-slate-200 line-clamp-1">${item.text}</p>
                     </div>
-                    <div class="flex items-center gap-1">
-                        <button onclick="editChallenge('${item.id}')" class="text-slate-400 hover:text-rose-300 p-2" title="Modifier">
-                            <i class="fa-solid fa-pen text-xs"></i>
+                    <div class="flex items-center gap-0.5">
+                        <button onclick="moveChallenge(${index}, -1)" class="text-slate-400 hover:text-white p-1.5" title="Monter">
+                            <i class="fa-solid fa-arrow-up text-[10px]"></i>
                         </button>
-                        <button onclick="deleteChallenge('${item.id}')" class="text-slate-500 hover:text-rose-400 p-2" title="Supprimer">
-                            <i class="fa-solid fa-trash text-xs"></i>
+                        <button onclick="moveChallenge(${index}, 1)" class="text-slate-400 hover:text-white p-1.5" title="Descendre">
+                            <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                        </button>
+                        <button onclick="editChallenge('${item.id}')" class="text-slate-400 hover:text-rose-300 p-1.5" title="Modifier">
+                            <i class="fa-solid fa-pen text-[10px]"></i>
+                        </button>
+                        <button onclick="deleteChallenge('${item.id}')" class="text-slate-500 hover:text-rose-400 p-1.5" title="Supprimer">
+                            <i class="fa-solid fa-trash text-[10px]"></i>
                         </button>
                     </div>
                 `;
@@ -1227,7 +2116,6 @@
             }
         }
 
-        // Sauvegarde globale complète (Défis + Galerie IndexedDB)
         async function exportFullBackup() {
             const mediaItems = await loadAllMediaFromDB();
             const backupData = {
@@ -1245,7 +2133,6 @@
             downloadAnchor.remove();
         }
 
-        // Restauration globale complète
         async function importFullBackup(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1423,8 +2310,8 @@
                 const mediaContainer = document.getElementById('card-media-preview');
                 mediaContainer.classList.remove('hidden');
                 mediaContainer.innerHTML = currentBlobData.type.startsWith('video')
-                    ? `<video src="${currentBlobData.url}" controls class="w-full h-32 object-cover rounded-xl"></video>`
-                    : `<img src="${currentBlobData.url}" class="w-full h-32 object-cover rounded-xl">`;
+                    ? `<video src="${currentBlobData.url}" autoplay muted loop playsinline class="w-full h-28 object-cover rounded-xl"></video>`
+                    : `<img src="${currentBlobData.url}" class="w-full h-28 object-cover rounded-xl">`;
 
                 closeMediaModal();
             }
